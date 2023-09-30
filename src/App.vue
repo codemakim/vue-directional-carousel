@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import VerticalCarousel from './components/VerticalCarousel.vue';
+import VerticalCarousel from './components/VerticalCarousel.vue'
 </script>
 
 <template>
-  <div style="margin: auto;">
+  <div style="margin: auto">
     <VerticalCarousel
       :items="[
         { src: 'item 1' },
@@ -16,7 +16,7 @@ import VerticalCarousel from './components/VerticalCarousel.vue';
         { src: 'item 8' },
         { src: 'item 9' },
         { src: 'item 10' },
-        { src: 'item 11' },
+        { src: 'item 11' }
       ]"
       :show-prev="false"
       :show-next="false"
@@ -24,16 +24,17 @@ import VerticalCarousel from './components/VerticalCarousel.vue';
         margin: 'auto'
       }"
     >
-    <template #item="item">
-      <div :style="{
-        backgroundColor: 'white',
-        color: 'black',
-        border: 'black solid 1px'
-      }">
-        {{ item.title }} / {{ item.url }}
-      </div>
-    </template>
+      <template #item="item">
+        <div
+          :style="{
+            backgroundColor: 'white',
+            color: 'black',
+            border: 'black solid 1px'
+          }"
+        >
+          {{ item.title }} / {{ item.url }}
+        </div>
+      </template>
     </VerticalCarousel>
-</div>
-  
+  </div>
 </template>

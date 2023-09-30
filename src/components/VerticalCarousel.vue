@@ -1,15 +1,23 @@
 <!-- eslint-disable vue/no-setup-props-destructure -->
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount, watch, type ComputedRef, type CSSProperties } from 'vue';
-import { type VerticalCarouselProps } from '../types/props';
+import {
+  ref,
+  computed,
+  onMounted,
+  onBeforeUnmount,
+  watch,
+  type ComputedRef,
+  type CSSProperties
+} from 'vue'
+import { type VerticalCarouselProps } from '../types/props'
 
 const TRANSLATE = 'translate'
 
 const props = withDefaults(defineProps<VerticalCarouselProps>(), {
   width: '400px',
   height: '300px',
-  direction: 'right', 
+  direction: 'right',
   duration: 1000,
   showPrev: true,
   showNext: true,
@@ -29,17 +37,17 @@ const numberHeight = computed(() => parseInt(props.height, 10))
  * direction 값이 right, up인 경우 인덱스에 따른 거리 값이 큰 수 부터 작은 수 순으로 출력됩니다.
  * direction 값이 left, right인 경우 width를 기준으로 거리 값을 계산하며,
  */
-const slideDistinct = computed(() =>  {
+const slideDistinct = computed(() => {
   // down, right인 경우 큰수부터 작은수 순으로 만들자.
   const axis = ['left', 'right'].includes(props.direction) ? numberWidth.value : numberHeight.value
   const distinct = ['up', 'left'].includes(props.direction)
     ? currentIndex.value % renderItems.value.length
-    : renderItems.value.length - (currentIndex.value + 1 % renderItems.value.length)
+    : renderItems.value.length - (currentIndex.value + (1 % renderItems.value.length))
   return distinct * axis
 })
 
 // direction 값에 따른 축 값
-const directionAxis = computed(() => ['left', 'right'].includes(props.direction) ? 'X' : 'Y')
+const directionAxis = computed(() => (['left', 'right'].includes(props.direction) ? 'X' : 'Y'))
 
 // 현재 화면에 표시되어야 하는 아이템의 인덱스를 이용해 만든 translate 값
 const itemsTranslate = computed(() => {
@@ -71,7 +79,7 @@ const rootStyle: CSSProperties = {
   overflow: 'hidden',
   position: 'relative',
   width: props.width,
-  height: props.height,
+  height: props.height
 }
 
 // 아이템 목록 엘리먼트의 스타일
@@ -85,7 +93,7 @@ const containerStyle: ComputedRef<CSSProperties> = computed(() => ({
 // 아이템 엘리먼트의 스타일
 const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
   width: props.width,
-  height: props.height,
+  height: props.height
 }))
 
 /**
@@ -93,7 +101,7 @@ const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
  * @return void
  */
 const setTransition = () => {
-  currentIndex.value = (++currentIndex.value) % renderItems.value.length
+  currentIndex.value = ++currentIndex.value % renderItems.value.length
   transition.value = defaultTransition.value
 }
 
@@ -108,7 +116,7 @@ const next = () => {
     setTimeout(() => {
       setTransition()
     }, 100)
-  }  else {
+  } else {
     setTransition()
   }
 }
@@ -119,17 +127,19 @@ const next = () => {
  * @return void
  */
 const prev = () => {
-  currentIndex.value = (currentIndex.value - 1 + renderItems.value.length) % renderItems.value.length
+  currentIndex.value =
+    (currentIndex.value - 1 + renderItems.value.length) % renderItems.value.length
 }
 
 // setIntervaldl 담길 변수
-let autoSlideInterval: number;
+let autoSlideInterval: number
 
 const watchItems = computed(() => props.items)
 const watchInterval = computed(() => props.interval)
 
 watch([watchItems, watchInterval], () => {
   clearInterval(autoSlideInterval)
+
   if (watchItems.value.length > 1) {
     autoSlideInterval = setInterval(next, watchInterval.value)
   }
@@ -154,7 +164,7 @@ const pauseSlide = () => {
  */
 const resumeSlide = () => {
   if (props.pauseAutoplayOnHover && isPaused.value) {
-    clearInterval(autoSlideInterval);
+    clearInterval(autoSlideInterval)
     autoSlideInterval = setInterval(next, props.interval)
     isPaused.value = false
   }
@@ -177,37 +187,18 @@ onBeforeUnmount(() => {
     @focusin="pauseSlide"
     @mouseleave="resumeSlide"
     @focusout="resumeSlide"
-    >
-    <div
-      :style="containerStyle"
-      class="wrapper-carousel-items"
-    >
+  >
+    <div :style="containerStyle" class="wrapper-carousel-items">
       <div
         v-for="(item, index) in renderItems"
         :key="index"
         :style="itemStyle"
         class="carousel-item"
       >
-        <slot
-          name="item"
-          v-bind="item"
-          :style="{width, height }"
-        />
+        <slot name="item" v-bind="item" :style="{ width, height }" />
       </div>
     </div>
   </div>
-  <button
-    v-if="showPrev"
-    class="prev-button"
-    @click="prev"
-  >
-    Prev
-  </button>
-  <button
-    v-if="showNext"
-    class="next-button"
-    @click="next"
-  >
-    Next
-  </button>
+  <button v-if="showPrev" class="prev-button" @click="prev">Prev</button>
+  <button v-if="showNext" class="next-button" @click="next">Next</button>
 </template>
