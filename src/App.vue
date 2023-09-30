@@ -1,42 +1,35 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
 import VerticalCarousel from './components/VerticalCarousel.vue';
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
-  <div style="color: 'white';"
-  >
+  <div style="margin: auto;">
     <VerticalCarousel
       :items="[
-        { title: 'item 1', url: 'naver.com' },
-        { title: 'item 2', url: 'naver.com' },
-        { title: 'item 3', url: 'naver.com' },
-        { title: 'item 4', url: 'naver.com' },
-        { title: 'item 5', url: 'naver.com' },
-        { title: 'item 6', url: 'naver.com' },
-        { title: 'item 7', url: 'naver.com' },
-        { title: 'item 8', url: 'naver.com' },
-        { title: 'item 9', url: 'naver.com' },
-        { title: 'item 10', url: 'naver.com' },
-        { title: 'item 11', url: 'naver.com' },
+        { src: 'item 1' },
+        { src: 'item 2' },
+        { src: 'item 3' },
+        { src: 'item 4' },
+        { src: 'item 5' },
+        { src: 'item 6' },
+        { src: 'item 7' },
+        { src: 'item 8' },
+        { src: 'item 9' },
+        { src: 'item 10' },
+        { src: 'item 11' },
       ]"
       :show-prev="false"
       :show-next="false"
+      :style="{
+        margin: 'auto'
+      }"
     >
     <template #item="item">
-      <div :style="{ backgroundColor: 'white', color: 'black' }">
+      <div :style="{
+        backgroundColor: 'white',
+        color: 'black',
+        border: 'black solid 1px'
+      }">
         {{ item.title }} / {{ item.url }}
       </div>
     </template>
@@ -44,32 +37,3 @@ import VerticalCarousel from './components/VerticalCarousel.vue';
 </div>
   
 </template>
-
-<style scoped>
-header {
-  line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-}
-</style>

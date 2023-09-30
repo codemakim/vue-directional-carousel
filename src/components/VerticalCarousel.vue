@@ -9,7 +9,7 @@ const TRANSLATE = 'translate'
 const props = withDefaults(defineProps<VerticalCarouselProps>(), {
   width: '400px',
   height: '300px',
-  direction: 'right',
+  direction: 'right', 
   duration: 1000,
   showPrev: true,
   showNext: true,

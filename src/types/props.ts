@@ -1,7 +1,10 @@
-export interface VerticalCarouselItem {
-  title: string
-  url: string
-}
+// export interface VerticalCarouselItem {
+//   title: string
+//   url: string
+// }
+
+export type VerticalCarouselItem = string | { src: string }
+
 export interface VerticalCarouselProps {
   width?: string
   height?: string
