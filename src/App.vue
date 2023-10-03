@@ -2,17 +2,17 @@
 import { ref } from 'vue'
 import DirectionalCarousel from './components/DirectionalCarousel.vue'
 const items = ref([
-  { src: 'item 1' },
-  { src: 'item 2' },
-  { src: 'item 3' },
-  { src: 'item 4' },
-  { src: 'item 5' },
-  { src: 'item 6' },
-  { src: 'item 7' },
-  { src: 'item 8' },
-  { src: 'item 9' },
-  { src: 'item 10' },
-  { src: 'item 11' }
+  'item 1',
+  'item 2',
+  'item 3',
+  'item 4',
+  'item 5',
+  'item 6',
+  'item 7',
+  'item 8',
+  'item 9',
+  'item 10',
+  'item 11'
 ])
 </script>
 

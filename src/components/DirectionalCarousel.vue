@@ -24,8 +24,13 @@ const props = withDefaults(defineProps<VerticalCarouselProps>(), {
   interval: 0,
   pauseAutoplayOnHover: false
 })
+// items가 string[]인 경우 { src: string }[] 형식으로 변경합니다.
+const computedItems = computed(() =>
+  props.items.map((el) => (typeof el === 'string' ? { src: el } : el))
+)
+
 // 렌더링에 사용할 아이템 목록
-const renderItems = computed(() => [...props.items, props.items[0]])
+const renderItems = computed(() => [...computedItems.value, computedItems.value[0]])
 // 현재 보여지는 아이템 인덱스
 const currentIndex = ref(0)
 // 이동 거리 계산을 위한 너비 값
@@ -168,7 +173,7 @@ const clickPrev = () => {
 // setIntervaldl 담길 변수
 let autoSlideInterval: number
 
-const watchItems = computed(() => props.items)
+const watchItems = computed(() => computedItems.value)
 const watchInterval = computed(() => props.interval)
 
 watch([watchItems, watchInterval], () => {
@@ -205,7 +210,7 @@ const resumeSlide = () => {
 }
 
 onMounted(() => {
-  if (props.items.length > 1 && props.interval) {
+  if (computedItems.value.length > 1 && props.interval) {
     console.log(props.interval)
     autoSlideInterval = setInterval(next, props.interval)
   }
@@ -230,7 +235,11 @@ onBeforeUnmount(() => {
         :style="itemStyle"
         class="carousel-item"
       >
-        <slot name="item" v-bind="item" :style="{ width, height }" />
+        <slot name="item" v-bind="item" :style="{ width, height }">
+          <div>
+            {{ item.src }}
+          </div>
+        </slot>
       </div>
     </div>
   </div>
