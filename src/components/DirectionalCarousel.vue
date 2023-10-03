@@ -21,7 +21,7 @@ const props = withDefaults(defineProps<VerticalCarouselProps>(), {
   duration: 1000,
   showPrev: true,
   showNext: true,
-  interval: 2000,
+  interval: 0,
   pauseAutoplayOnHover: false
 })
 // 렌더링에 사용할 아이템 목록
@@ -32,18 +32,23 @@ const currentIndex = ref(0)
 const numberWidth = computed(() => parseInt(props.width, 10))
 // 이동 거리 계산을 위한 높이 값
 const numberHeight = computed(() => parseInt(props.height, 10))
+// 축을 결정하는 값
+const axis = computed(() =>
+  ['left', 'right'].includes(props.direction) ? numberWidth.value : numberHeight.value
+)
+// 거리를 결정하는 값
+const distinct = computed(() =>
+  ['up', 'left'].includes(props.direction)
+    ? currentIndex.value % renderItems.value.length
+    : renderItems.value.length - (currentIndex.value + (1 % renderItems.value.length))
+)
 
 /**
  * direction 값이 right, up인 경우 인덱스에 따른 거리 값이 큰 수 부터 작은 수 순으로 출력됩니다.
  * direction 값이 left, right인 경우 width를 기준으로 거리 값을 계산하며,
  */
 const slideDistinct = computed(() => {
-  // down, right인 경우 큰수부터 작은수 순으로 만들자.
-  const axis = ['left', 'right'].includes(props.direction) ? numberWidth.value : numberHeight.value
-  const distinct = ['up', 'left'].includes(props.direction)
-    ? currentIndex.value % renderItems.value.length
-    : renderItems.value.length - (currentIndex.value + (1 % renderItems.value.length))
-  return distinct * axis
+  return distinct.value * axis.value
 })
 
 // direction 값에 따른 축 값
@@ -122,13 +127,42 @@ const next = () => {
 }
 
 /**
- * TODO: 실제 구동한 적이 없으며, 추가 개발이 필요함
+ * 인터벌을 초기화합니다. next, prev 버튼을 클릭하거나, 슬라이드 동작 재게될 때 호출됩니다.
+ */
+const initInterval = () => {
+  clearInterval(autoSlideInterval)
+  autoSlideInterval = setInterval(next, props.interval)
+}
+
+const clickNext = () => {
+  next()
+  if (props.interval) {
+    initInterval()
+  }
+}
+
+const prevIndex = computed(
+  () => (currentIndex.value - 1 + renderItems.value.length) % renderItems.value.length
+)
+
+/**
  * 아이템이 이전 순서로 슬라이드 동작하도록 하기 위한 이벤트 핸들러
  * @return void
  */
-const prev = () => {
-  currentIndex.value =
-    (currentIndex.value - 1 + renderItems.value.length) % renderItems.value.length
+const clickPrev = () => {
+  if (currentIndex.value === 0) {
+    transition.value = ''
+    currentIndex.value = prevIndex.value
+    setTimeout(() => {
+      currentIndex.value = prevIndex.value
+      transition.value = defaultTransition.value
+    }, 100)
+  } else {
+    currentIndex.value = prevIndex.value
+  }
+  if (props.interval) {
+    initInterval()
+  }
 }
 
 // setIntervaldl 담길 변수
@@ -138,10 +172,11 @@ const watchItems = computed(() => props.items)
 const watchInterval = computed(() => props.interval)
 
 watch([watchItems, watchInterval], () => {
-  clearInterval(autoSlideInterval)
-
-  if (watchItems.value.length > 1) {
-    autoSlideInterval = setInterval(next, watchInterval.value)
+  if (watchInterval.value) {
+    clearInterval(autoSlideInterval)
+    if (watchItems.value.length > 1) {
+      autoSlideInterval = setInterval(next, watchInterval.value)
+    }
   }
 })
 
@@ -164,14 +199,14 @@ const pauseSlide = () => {
  */
 const resumeSlide = () => {
   if (props.pauseAutoplayOnHover && isPaused.value) {
-    clearInterval(autoSlideInterval)
-    autoSlideInterval = setInterval(next, props.interval)
+    initInterval()
     isPaused.value = false
   }
 }
 
 onMounted(() => {
-  if (props.items.length > 1) {
+  if (props.items.length > 1 && props.interval) {
+    console.log(props.interval)
     autoSlideInterval = setInterval(next, props.interval)
   }
 })
@@ -199,6 +234,6 @@ onBeforeUnmount(() => {
       </div>
     </div>
   </div>
-  <button v-if="showPrev" class="prev-button" @click="prev">Prev</button>
-  <button v-if="showNext" class="next-button" @click="next">Next</button>
+  <button v-if="showPrev" class="prev-button" @click="clickPrev">Prev</button>
+  <button v-if="showNext" class="next-button" @click="clickNext">Next</button>
 </template>

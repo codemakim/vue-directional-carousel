@@ -9,7 +9,7 @@ export interface VerticalCarouselProps {
   width?: string
   height?: string
   items: VerticalCarouselItem[]
-  direction: 'left' | 'right' | 'up' | 'down'
+  direction?: 'left' | 'right' | 'up' | 'down'
   duration?: number
   showPrev?: boolean
   showNext?: boolean
