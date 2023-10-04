@@ -220,6 +220,7 @@ const buttonStyle: CSSProperties = {
   alignItems: 'center'
 }
 
+// 아이템 목록 wrapper 엘리먼트의 스타일
 const wrapperContainerStyle: CSSProperties = {
   overflow: 'hidden',
   position: 'relative',
@@ -252,8 +253,8 @@ const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
     @mouseleave="resumeSlide"
     @focusout="resumeSlide"
   >
-    <div :style="buttonStyle">
-      <button v-if="showPrev" class="prev-button" @click="clickPrev">&lt;</button>
+    <div v-if="showPrev" :style="buttonStyle">
+      <button class="prev-button" @click="clickPrev">&lt;</button>
     </div>
     <div ref="wrapperContainer" :style="wrapperContainerStyle">
       <div :style="containerStyle" class="wrapper-carousel-items">
@@ -271,8 +272,8 @@ const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
         </div>
       </div>
     </div>
-    <div :style="buttonStyle">
-      <button v-if="showNext" class="next-button" @click="clickNext">&gt;</button>
+    <div v-if="showNext" :style="buttonStyle">
+      <button class="next-button" @click="clickNext">&gt;</button>
     </div>
   </div>
 </template>
