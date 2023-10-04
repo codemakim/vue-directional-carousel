@@ -7,6 +7,7 @@ import {
   onMounted,
   onBeforeUnmount,
   watch,
+  type Ref,
   type ComputedRef,
   type CSSProperties
 } from 'vue'
@@ -24,6 +25,10 @@ const props = withDefaults(defineProps<VerticalCarouselProps>(), {
   interval: 0,
   pauseAutoplayOnHover: false
 })
+
+// 캐러샐 영역의 너비
+const wrapperContainer: Ref<HTMLElement | null> = ref(null)
+
 // items가 string[]인 경우 { src: string }[] 형식으로 변경합니다.
 const computedItems = computed(() =>
   props.items.map((el) => (typeof el === 'string' ? { src: el } : el))
@@ -34,9 +39,9 @@ const renderItems = computed(() => [...computedItems.value, computedItems.value[
 // 현재 보여지는 아이템 인덱스
 const currentIndex = ref(0)
 // 이동 거리 계산을 위한 너비 값
-const numberWidth = computed(() => parseInt(props.width, 10))
+const numberWidth = computed(() => wrapperContainer.value?.offsetWidth ?? 0)
 // 이동 거리 계산을 위한 높이 값
-const numberHeight = computed(() => parseInt(props.height, 10))
+const numberHeight = computed(() => wrapperContainer.value?.offsetHeight ?? 0)
 // 축을 결정하는 값
 const axis = computed(() =>
   ['left', 'right'].includes(props.direction) ? numberWidth.value : numberHeight.value
@@ -83,28 +88,6 @@ const getDirection = (direction: string) => {
       return 'row-reverse'
   }
 }
-
-// 취상위 엘리먼트의 CSS 스타일
-const rootStyle: CSSProperties = {
-  overflow: 'hidden',
-  position: 'relative',
-  width: props.width,
-  height: props.height
-}
-
-// 아이템 목록 엘리먼트의 스타일
-const containerStyle: ComputedRef<CSSProperties> = computed(() => ({
-  display: 'inline-flex',
-  flexDirection: getDirection(props.direction),
-  transform: itemsTranslate.value,
-  transition: transition.value
-}))
-
-// 아이템 엘리먼트의 스타일
-const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
-  width: props.width,
-  height: props.height
-}))
 
 /**
  * item에 현재 index에 맞는 translate 속성을 부여
@@ -219,6 +202,47 @@ onMounted(() => {
 onBeforeUnmount(() => {
   clearInterval(autoSlideInterval)
 })
+
+// 취상위 엘리먼트의 CSS 스타일
+const rootStyle: CSSProperties = {
+  overflow: 'hidden',
+  position: 'relative',
+  display: 'flex',
+  width: props.width,
+  height: props.height
+}
+
+// button CSS 스타일
+const buttonStyle: CSSProperties = {
+  zIndex: 1,
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center'
+}
+
+const wrapperContainerStyle: CSSProperties = {
+  overflow: 'hidden',
+  position: 'relative',
+  flex: 1
+}
+
+// 아이템 목록 엘리먼트의 스타일
+const containerStyle: ComputedRef<CSSProperties> = computed(() => ({
+  display: 'inline-flex',
+  position: 'relative',
+  flexDirection: getDirection(props.direction),
+  transform: itemsTranslate.value,
+  transition: transition.value
+}))
+
+// 아이템 엘리먼트의 스타일
+const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
+  width: numberWidth.value + 'px',
+  height: numberHeight.value + 'px',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center'
+}))
 </script>
 <template>
   <div
@@ -228,21 +252,27 @@ onBeforeUnmount(() => {
     @mouseleave="resumeSlide"
     @focusout="resumeSlide"
   >
-    <div :style="containerStyle" class="wrapper-carousel-items">
-      <div
-        v-for="(item, index) in renderItems"
-        :key="index"
-        :style="itemStyle"
-        class="carousel-item"
-      >
-        <slot name="item" v-bind="item" :style="{ width, height }">
-          <div>
-            {{ item.src }}
-          </div>
-        </slot>
+    <div :style="buttonStyle">
+      <button v-if="showPrev" class="prev-button" @click="clickPrev">&lt;</button>
+    </div>
+    <div ref="wrapperContainer" :style="wrapperContainerStyle">
+      <div :style="containerStyle" class="wrapper-carousel-items">
+        <div
+          v-for="(item, index) in renderItems"
+          :key="index"
+          :style="itemStyle"
+          class="carousel-item"
+        >
+          <slot name="item" v-bind="item" :style="{ width, height }">
+            <div>
+              {{ item.src }}
+            </div>
+          </slot>
+        </div>
       </div>
     </div>
+    <div :style="buttonStyle">
+      <button v-if="showNext" class="next-button" @click="clickNext">&gt;</button>
+    </div>
   </div>
-  <button v-if="showPrev" class="prev-button" @click="clickPrev">Prev</button>
-  <button v-if="showNext" class="next-button" @click="clickNext">Next</button>
 </template>

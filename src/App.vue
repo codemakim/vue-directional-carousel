@@ -18,7 +18,7 @@ const items = ref([
 
 <template>
   <div style="margin: auto">
-    <DirectionalCarousel :items="items" :direction="'left'">
+    <DirectionalCarousel :items="items" :direction="'down'" :width="'600px'" :height="'200px'">
       <template #item="item">
         <div
           :style="{
