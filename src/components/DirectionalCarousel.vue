@@ -27,7 +27,7 @@ const props = withDefaults(defineProps<VerticalCarouselProps>(), {
 })
 
 // 캐러샐 영역의 너비
-const wrapperContainer: Ref<HTMLElement | null> = ref(null)
+const carouselContainer: Ref<HTMLElement | null> = ref(null)
 
 // items가 string[]인 경우 { src: string }[] 형식으로 변경합니다.
 const computedItems = computed(() =>
@@ -39,9 +39,9 @@ const renderItems = computed(() => [...computedItems.value, computedItems.value[
 // 현재 보여지는 아이템 인덱스
 const currentIndex = ref(0)
 // 이동 거리 계산을 위한 너비 값
-const numberWidth = computed(() => wrapperContainer.value?.offsetWidth ?? 0)
+const numberWidth = computed(() => carouselContainer.value?.offsetWidth ?? 0)
 // 이동 거리 계산을 위한 높이 값
-const numberHeight = computed(() => wrapperContainer.value?.offsetHeight ?? 0)
+const numberHeight = computed(() => carouselContainer.value?.offsetHeight ?? 0)
 // 축을 결정하는 값
 const axis = computed(() =>
   ['left', 'right'].includes(props.direction) ? numberWidth.value : numberHeight.value
@@ -75,9 +75,11 @@ const defaultTransition = ref(`transform ${props.duration / 1000}s ease`)
 // 초기화 과정에서 원본 ( defaultTransition )을 보존하기 위한 값
 const transition = ref(defaultTransition.value)
 
+const direction = computed(() => props.direction)
+
 // 전달 받은 방향 값을 이용해 flex-direction 속성 값을 반환합니다.
-const getDirection = (direction: string) => {
-  switch (direction) {
+const flexDirection = computed(() => {
+  switch (direction.value) {
     case 'left':
       return 'row'
     case 'up':
@@ -87,7 +89,7 @@ const getDirection = (direction: string) => {
     default:
       return 'row-reverse'
   }
-}
+})
 
 /**
  * item에 현재 index에 맞는 translate 속성을 부여
@@ -193,6 +195,7 @@ const resumeSlide = () => {
 }
 
 onMounted(() => {
+  transition.value = ''
   if (computedItems.value.length > 1 && props.interval) {
     autoSlideInterval = setInterval(next, props.interval)
   }
@@ -201,17 +204,6 @@ onMounted(() => {
 onBeforeUnmount(() => {
   clearInterval(autoSlideInterval)
 })
-
-// 취상위 엘리먼트의 CSS 스타일
-const rootStyle: CSSProperties = {
-  overflow: 'hidden',
-  left: 0,
-  right: 0,
-  position: 'relative',
-  display: 'flex',
-  width: props.width,
-  height: props.height
-}
 
 // button Wrapper CSS 스타일
 const buttonWrapperStyle: CSSProperties = {
@@ -243,22 +235,6 @@ const onMouseUpButton = () => {
   buttonStyle.value.color = 'silver'
 }
 
-// 아이템 목록 wrapper 엘리먼트의 스타일
-const wrapperContainerStyle: CSSProperties = {
-  overflow: 'hidden',
-  position: 'relative',
-  flex: 1
-}
-
-// 아이템 목록 엘리먼트의 스타일
-const containerStyle: ComputedRef<CSSProperties> = computed(() => ({
-  display: 'inline-flex',
-  position: 'relative',
-  flexDirection: getDirection(props.direction),
-  transform: itemsTranslate.value,
-  transition: transition.value
-}))
-
 // 아이템 엘리먼트의 스타일
 const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
   overflow: 'hidden',
@@ -271,8 +247,16 @@ const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
 </script>
 <template>
   <div
-    class="directional-carousel"
-    :style="rootStyle"
+    class="slider"
+    :style="{
+      overflow: 'hidden',
+      left: 0,
+      right: 0,
+      position: 'relative',
+      display: 'flex',
+      width: props.width,
+      height: props.height
+    }"
     @mouseenter="pauseSlide"
     @focusin="pauseSlide"
     @mouseleave="resumeSlide"
@@ -286,8 +270,8 @@ const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
         @mousedown="onMouseDownButton"
       >
         <img
-          :src="'src/assets/arrow-point-to-right.png'"
           alt="left arrow"
+          :src="'src/assets/arrow-point-to-right.png'"
           :style="{
             width: '10px',
             borderRadius: '3px',
@@ -296,8 +280,24 @@ const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
         />
       </button>
     </div>
-    <div ref="wrapperContainer" :style="wrapperContainerStyle">
-      <div :style="containerStyle" class="wrapper-carousel-items">
+    <div
+      ref="carouselContainer"
+      :style="{
+        overflow: 'hidden',
+        position: 'relative',
+        flex: 1
+      }"
+    >
+      <div
+        class="wrapper-carousel-items"
+        :style="{
+          display: 'inline-flex',
+          position: 'relative',
+          flexDirection: flexDirection,
+          transform: itemsTranslate,
+          transition: transition
+        }"
+      >
         <div
           v-for="(item, index) in renderItems"
           :key="index"
@@ -324,8 +324,8 @@ const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
         @mouseup="onMouseUpButton"
       >
         <img
-          :src="'src/assets/arrow-point-to-right.png'"
           alt="left arrow"
+          :src="'src/assets/arrow-point-to-right.png'"
           :style="{
             width: '10px',
             borderRadius: '3px'
