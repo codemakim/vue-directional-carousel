@@ -37,32 +37,32 @@ export default {
 
 - Use the vue-directional-carousel component in your template:
 
-```javascript
+```html
 <template>
-   <div>
-      <directional-carousel
-         :items="imageList"
-         :show-prev="true"
-         :show-next="true"
-         :interval="2000"
-         direction="down"
-         width="100%"
-         height="200px"
-      />
-   </div>
+  <div>
+    <directional-carousel
+      :items="imageList"
+      :show-prev="true"
+      :show-next="true"
+      :interval="2000"
+      direction="down"
+      width="100%"
+      height="200px"
+    />
+  </div>
 </template>
 <script setup>
-   import DirectionalCarousel from 'vue-directional-carousel'
+  import DirectionalCarousel from 'vue-directional-carousel'
 
-   // Define your carousel image here
-   const imageList = [
-      'src/assets/sample1.png',
-      'src/assets/sample2.png',
-      'src/assets/sample3.png',
-      'src/assets/sample4.png',
-      'src/assets/sample5.png',
-      ...
-   ]
+  // Define your carousel image here
+  const imageList = [
+     'src/assets/sample1.png',
+     'src/assets/sample2.png',
+     'src/assets/sample3.png',
+     'src/assets/sample4.png',
+     'src/assets/sample5.png',
+     ...
+  ]
 </script>
 ```
 
