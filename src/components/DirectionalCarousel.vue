@@ -16,7 +16,7 @@ import { type VerticalCarouselProps } from '../types/props'
 const TRANSLATE = 'translate'
 
 const props = withDefaults(defineProps<VerticalCarouselProps>(), {
-  width: '400px',
+  width: '100%',
   height: '300px',
   direction: 'right',
   duration: 1000,
@@ -194,7 +194,6 @@ const resumeSlide = () => {
 
 onMounted(() => {
   if (computedItems.value.length > 1 && props.interval) {
-    console.log(props.interval)
     autoSlideInterval = setInterval(next, props.interval)
   }
 })
@@ -206,18 +205,42 @@ onBeforeUnmount(() => {
 // 취상위 엘리먼트의 CSS 스타일
 const rootStyle: CSSProperties = {
   overflow: 'hidden',
+  left: 0,
+  right: 0,
   position: 'relative',
   display: 'flex',
   width: props.width,
   height: props.height
 }
 
-// button CSS 스타일
-const buttonStyle: CSSProperties = {
+// button Wrapper CSS 스타일
+const buttonWrapperStyle: CSSProperties = {
   zIndex: 1,
   display: 'flex',
   justifyContent: 'center',
-  alignItems: 'center'
+  alignItems: 'center',
+  padding: '5px'
+}
+
+// button CSS 스타일
+const buttonStyle: Ref<CSSProperties> = ref({
+  height: '20px',
+  border: 'none',
+  color: 'silver',
+  borderRadius: '10px'
+})
+
+/**
+ * button handler - mouse down
+ */
+const onMouseDownButton = () => {
+  buttonStyle.value.color = 'gray'
+}
+/**
+ * button handler - mouse up
+ */
+const onMouseUpButton = () => {
+  buttonStyle.value.color = 'silver'
 }
 
 // 아이템 목록 wrapper 엘리먼트의 스타일
@@ -238,6 +261,7 @@ const containerStyle: ComputedRef<CSSProperties> = computed(() => ({
 
 // 아이템 엘리먼트의 스타일
 const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
+  overflow: 'hidden',
   width: numberWidth.value + 'px',
   height: numberHeight.value + 'px',
   display: 'flex',
@@ -247,14 +271,30 @@ const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
 </script>
 <template>
   <div
+    class="directional-carousel"
     :style="rootStyle"
     @mouseenter="pauseSlide"
     @focusin="pauseSlide"
     @mouseleave="resumeSlide"
     @focusout="resumeSlide"
   >
-    <div v-if="showPrev" :style="buttonStyle">
-      <button class="prev-button" @click="clickPrev">&lt;</button>
+    <div v-if="showPrev" :style="buttonWrapperStyle">
+      <button
+        class="prev-button"
+        :style="buttonStyle"
+        @click="clickPrev"
+        @mousedown="onMouseDownButton"
+      >
+        <img
+          :src="'src/assets/arrow-point-to-right.png'"
+          alt="left arrow"
+          :style="{
+            width: '10px',
+            borderRadius: '3px',
+            transform: 'scaleX(-1)'
+          }"
+        />
+      </button>
     </div>
     <div ref="wrapperContainer" :style="wrapperContainerStyle">
       <div :style="containerStyle" class="wrapper-carousel-items">
@@ -265,15 +305,33 @@ const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
           class="carousel-item"
         >
           <slot name="item" v-bind="item" :style="{ width, height }">
-            <div>
-              {{ item.src }}
-            </div>
+            <img
+              :src="item.src"
+              :alt="`directiional-carousel-image-${index}`"
+              :style="{
+                width: '100%'
+              }"
+            />
           </slot>
         </div>
       </div>
     </div>
-    <div v-if="showNext" :style="buttonStyle">
-      <button class="next-button" @click="clickNext">&gt;</button>
+    <div v-if="showNext" :style="buttonWrapperStyle">
+      <button
+        class="next-button"
+        :style="buttonStyle"
+        @click="clickNext"
+        @mouseup="onMouseUpButton"
+      >
+        <img
+          :src="'src/assets/arrow-point-to-right.png'"
+          alt="left arrow"
+          :style="{
+            width: '10px',
+            borderRadius: '3px'
+          }"
+        />
+      </button>
     </div>
   </div>
 </template>

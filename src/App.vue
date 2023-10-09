@@ -2,42 +2,31 @@
 import { ref } from 'vue'
 import DirectionalCarousel from './components/DirectionalCarousel.vue'
 const items = ref([
-  'item 1',
-  'item 2',
-  'item 3',
-  'item 4',
-  'item 5',
-  'item 6',
-  'item 7',
-  'item 8',
-  'item 9',
-  'item 10',
-  'item 11'
+  'src/assets/sampleImage/carousel_image.jpg',
+  'src/assets/sampleImage/carousel_image.jpg',
+  'src/assets/sampleImage/carousel_image.jpg',
+  'src/assets/sampleImage/carousel_image.jpg',
+  'src/assets/sampleImage/carousel_image.jpg',
+  'src/assets/sampleImage/carousel_image.jpg',
+  'src/assets/sampleImage/carousel_image.jpg',
+  'src/assets/sampleImage/carousel_image.jpg',
+  'src/assets/sampleImage/carousel_image.jpg',
+  'src/assets/sampleImage/carousel_image.jpg',
+  'src/assets/sampleImage/carousel_image.jpg'
 ])
 </script>
 
 <template>
-  <div style="margin: auto">
+  <div style="margin: 0 auto">
     <DirectionalCarousel
       :items="items"
       :direction="'down'"
-      :width="'600px'"
+      :width="'50%'"
       :height="'200px'"
-      :show-prev="false"
-      :show-next="false"
+      :show-prev="true"
+      :show-next="true"
       :interval="2000"
     >
-      <template #item="item">
-        <div
-          :style="{
-            backgroundColor: 'white',
-            color: 'black',
-            border: 'black solid 1px'
-          }"
-        >
-          {{ item.src }}
-        </div>
-      </template>
     </DirectionalCarousel>
   </div>
 </template>

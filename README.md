@@ -1,46 +1,75 @@
 # vue-directional-carousel
 
-This template should help get you started developing with Vue 3 in Vite.
+This is a Vue 3 component that allows you to set the direction of image movement not only vertically and horizontally but also in different directions (left, right, up, down).
 
-## Recommended IDE Setup
+## Installation
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+You can install the `vue-directional-carousel` package via npm or yarn:
 
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
-
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
-
-1. Disable the built-in TypeScript Extension
-   1. Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-   2. Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
+```bash
+npm install vue-directional-carousel
 ```
 
-### Compile and Hot-Reload for Development
+or
 
-```sh
-npm run dev
+```bash
+yarn install vue-directional-carousel
 ```
 
-### Type-Check, Compile and Minify for Production
+## Usage
 
-```sh
-npm run build
+- Import the VueDirectionalCarousel component in your Vue.js project:
+
+```javascript
+import { DirectionalCarousel } from 'vue-directional-carousel'
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+- Register the VueDirectionalCarousel component locally in your component:
 
-```sh
-npm run lint
+```javascript
+// if use options api
+export default {
+  components: {
+    DirectionalCarousel
+  }
+}
 ```
+
+- Use the vue-directional-carousel component in your template:
+
+```javascript
+<template>
+   <div>
+      <directional-carousel
+         :items="imageList"
+         :show-prev="true"
+         :show-next="true"
+         :interval="2000"
+         direction="down"
+         width="100%"
+         height="200px"
+      />
+   </div>
+</template>
+<script setup>
+   import DirectionalCarousel from 'vue-directional-carousel'
+
+   // Define your carousel image here
+   const imageList = [
+      'src/assets/sample1.png',
+      'src/assets/sample2.png',
+      'src/assets/sample3.png',
+      'src/assets/sample4.png',
+      'src/assets/sample5.png',
+      ...
+   ]
+</script>
+```
+
+## Props
+
+## Events
+
+## Contributing
+
+## License
