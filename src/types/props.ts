@@ -8,6 +8,7 @@ export interface VerticalCarouselProps {
   duration?: number
   showPrev?: boolean
   showNext?: boolean
+  showDots?: boolean
   interval?: number
   pauseAutoplayOnHover?: boolean
 }

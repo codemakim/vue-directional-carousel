@@ -25,6 +25,7 @@ const items = ref([
       :height="'200px'"
       :show-prev="true"
       :show-next="true"
+      :show-dots="true"
       :interval="2000"
     >
     </DirectionalCarousel>

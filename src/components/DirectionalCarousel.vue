@@ -22,22 +22,26 @@ const props = withDefaults(defineProps<VerticalCarouselProps>(), {
   duration: 1000,
   showPrev: true,
   showNext: true,
+  showDots: true,
   interval: 0,
   pauseAutoplayOnHover: false
 })
 
 // 캐러샐 영역의 너비
 const carouselContainer: Ref<HTMLElement | null> = ref(null)
-
+// 이미지 인덱스 표시 점 부분 엘리먼트
+const dotWrapper: Ref<HTMLElement | null> = ref(null)
 // items가 string[]인 경우 { src: string }[] 형식으로 변경합니다.
 const computedItems = computed(() =>
   props.items.map((el) => (typeof el === 'string' ? { src: el } : el))
 )
-
+// 이미지 수
+const itemCount = computed(() => props.items.length)
 // 렌더링에 사용할 아이템 목록
 const renderItems = computed(() => [...computedItems.value, computedItems.value[0]])
 // 현재 보여지는 아이템 인덱스
 const currentIndex = ref(0)
+const dotWrapperHeight = computed(() => dotWrapper.value?.offsetHeight ?? 0)
 // 이동 거리 계산을 위한 너비 값
 const numberWidth = computed(() => carouselContainer.value?.offsetWidth ?? 0)
 // 이동 거리 계산을 위한 높이 값
@@ -75,9 +79,8 @@ const defaultTransition = ref(`transform ${props.duration / 1000}s ease`)
 // 초기화 과정에서 원본 ( defaultTransition )을 보존하기 위한 값
 const transition = ref(defaultTransition.value)
 
-const direction = computed(() => props.direction)
-
 // 전달 받은 방향 값을 이용해 flex-direction 속성 값을 반환합니다.
+const direction = computed(() => props.direction)
 const flexDirection = computed(() => {
   switch (direction.value) {
     case 'left':
@@ -150,6 +153,35 @@ const clickPrev = () => {
   } else {
     currentIndex.value = prevIndex.value
   }
+  if (props.interval) {
+    initInterval()
+  }
+}
+
+const dotStyles = computed(() =>
+  new Array(itemCount.value)
+    .fill({
+      border: 'none',
+      borderRadius: '50%',
+      backgroundColor: 'gray',
+      cursor: 'pointer'
+    })
+    .map((el, index) => {
+      const isCurrent = index === (itemCount.value > currentIndex.value ? currentIndex.value : 0)
+      return {
+        ...el,
+        opacity: isCurrent ? '1' : '0.5',
+        height: isCurrent ? '8px' : '6px',
+        paddingInline: isCurrent ? '4px' : '3px'
+      }
+    })
+)
+
+/**
+ * dot button 클릭 핸들러
+ */
+const clickDot = (index: number) => {
+  currentIndex.value = index
   if (props.interval) {
     initInterval()
   }
@@ -247,91 +279,118 @@ const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
 </script>
 <template>
   <div
-    class="slider"
     :style="{
       overflow: 'hidden',
-      left: 0,
-      right: 0,
-      position: 'relative',
       display: 'flex',
+      flexDirection: 'column',
       width: props.width,
       height: props.height
     }"
-    @mouseenter="pauseSlide"
-    @focusin="pauseSlide"
-    @mouseleave="resumeSlide"
-    @focusout="resumeSlide"
   >
-    <div v-if="showPrev" :style="buttonWrapperStyle">
-      <button
-        class="prev-button"
-        :style="buttonStyle"
-        @click="clickPrev"
-        @mousedown="onMouseDownButton"
-      >
-        <img
-          alt="left arrow"
-          :src="'src/assets/arrow-point-to-right.png'"
-          :style="{
-            width: '10px',
-            borderRadius: '3px',
-            transform: 'scaleX(-1)'
-          }"
-        />
-      </button>
-    </div>
     <div
-      ref="carouselContainer"
+      class="slider"
       :style="{
         overflow: 'hidden',
         position: 'relative',
-        flex: 1
+        display: 'flex',
+        width: '100%',
+        height: '100%'
       }"
+      @mouseenter="pauseSlide"
+      @focusin="pauseSlide"
+      @mouseleave="resumeSlide"
+      @focusout="resumeSlide"
     >
+      <div v-if="showPrev" :style="buttonWrapperStyle">
+        <button
+          class="prev-button"
+          :style="buttonStyle"
+          @click="clickPrev"
+          @mousedown="onMouseDownButton"
+        >
+          <img
+            alt="left arrow"
+            :src="'src/assets/arrow-point-to-right.png'"
+            :style="{
+              width: '10px',
+              borderRadius: '5px',
+              transform: 'scaleX(-1)'
+            }"
+          />
+        </button>
+      </div>
       <div
-        class="wrapper-carousel-items"
+        ref="carouselContainer"
         :style="{
-          display: 'inline-flex',
+          overflow: 'hidden',
           position: 'relative',
-          flexDirection: flexDirection,
-          transform: itemsTranslate,
-          transition: transition
+          flex: 1
         }"
       >
         <div
-          v-for="(item, index) in renderItems"
-          :key="index"
-          :style="itemStyle"
-          class="carousel-item"
+          class="wrapper-carousel-items"
+          :style="{
+            display: 'inline-flex',
+            position: 'relative',
+            flexDirection: flexDirection,
+            transform: itemsTranslate,
+            transition: transition
+          }"
         >
-          <slot name="item" v-bind="item" :style="{ width, height }">
-            <img
-              :src="item.src"
-              :alt="`directiional-carousel-image-${index}`"
-              :style="{
-                width: '100%'
-              }"
-            />
-          </slot>
+          <div
+            v-for="(item, index) in renderItems"
+            :key="index"
+            :style="itemStyle"
+            class="carousel-item"
+          >
+            <slot name="item" v-bind="item" :style="{ width, height }">
+              <img
+                :src="item.src"
+                :alt="`directiional-carousel-image-${index}`"
+                :style="{
+                  width: '100%'
+                }"
+              />
+            </slot>
+          </div>
         </div>
       </div>
+      <div v-if="showNext" :style="buttonWrapperStyle">
+        <button
+          class="next-button"
+          :style="buttonStyle"
+          @click="clickNext"
+          @mouseup="onMouseUpButton"
+        >
+          <img
+            alt="left arrow"
+            :src="'src/assets/arrow-point-to-right.png'"
+            :style="{
+              width: '10px',
+              borderRadius: '3px'
+            }"
+          />
+        </button>
+      </div>
     </div>
-    <div v-if="showNext" :style="buttonWrapperStyle">
-      <button
-        class="next-button"
-        :style="buttonStyle"
-        @click="clickNext"
-        @mouseup="onMouseUpButton"
+    <div
+      v-if="showDots"
+      ref="dotWrapper"
+      :style="{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexWrap: 'wrap'
+      }"
+    >
+      <div
+        v-for="seq in itemCount"
+        :style="{
+          padding: '0px 4px 0px 4px'
+        }"
       >
-        <img
-          alt="left arrow"
-          :src="'src/assets/arrow-point-to-right.png'"
-          :style="{
-            width: '10px',
-            borderRadius: '3px'
-          }"
-        />
-      </button>
+        <button :style="dotStyles[seq - 1]" @click="clickDot(seq - 1)" />
+      </div>
     </div>
   </div>
 </template>
