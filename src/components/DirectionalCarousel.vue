@@ -313,7 +313,7 @@ const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
             :src="'src/assets/arrow-point-to-right.png'"
             :style="{
               width: '10px',
-              borderRadius: '5px',
+              borderRadius: '50%',
               transform: 'scaleX(-1)'
             }"
           />
