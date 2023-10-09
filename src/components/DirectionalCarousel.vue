@@ -1,17 +1,17 @@
 <!-- eslint-disable vue/no-setup-props-destructure -->
 
 <script setup lang="ts">
+import { type VerticalCarouselProps } from '../types/props'
 import {
+  type Ref,
+  type ComputedRef,
+  type CSSProperties,
   ref,
   computed,
   onMounted,
   onBeforeUnmount,
-  watch,
-  type Ref,
-  type ComputedRef,
-  type CSSProperties
+  watch
 } from 'vue'
-import { type VerticalCarouselProps } from '../types/props'
 
 const TRANSLATE = 'translate'
 
