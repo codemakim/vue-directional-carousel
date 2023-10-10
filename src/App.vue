@@ -20,7 +20,7 @@ const items = ref([
   <div style="display: flex; justify-content: center">
     <DirectionalCarousel
       :items="items"
-      :direction="'right'"
+      :direction="'down'"
       :width="'50%'"
       :height="'200px'"
       :show-prev="true"
