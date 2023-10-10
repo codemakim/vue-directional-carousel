@@ -68,18 +68,18 @@ export default {
 
 ## Props
 
-| props                | type                                | isRequire | default | description                                                                                                                          |
-| -------------------- | ----------------------------------- | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| items                | string[] \| { src: string}[]        | O         |         | 캐러셀에 사용할 이미지 목록                                                                                                          |
-| width                | string                              | X         | '100%'  | 캐러셀의 너비                                                                                                                        |
-| height               | string                              | X         | '300px' | 캐러셀의 높이                                                                                                                        |
-| directtion           | 'left' \| 'right' \| 'up' \| 'down' | X         | 'right' | 이미지가 흐르는 방향                                                                                                                 |
-| duration             | number                              | X         | 1000    | 슬라이드 지속 기간 (짧을 수록 빠르게 흐름)                                                                                           |
-| interval             | number                              | X         | 0       | 이미지 자동 슬라이드 간격 (단위: ms). 0으로 설정 시 자동 슬라이드 하지 않음.                                                         |
-| pauseAutoplayOnHover | boolean                             | X         | false   | 자동 슬라이드 설정 시 마우스를 캐러셀 내 이미지 위로 둘 경우 자동 슬라이드 정지. 마우스를 영역 밖으로 옮기면 다시 자동 슬라이드 재개 |
-| showPrev             | boolean                             | X         | true    | 이전 버튼                                                                                                                            |
-| showNext             | boolean                             | X         | true    | 다음 버튼                                                                                                                            |
-| showDots             | boolean                             | X         | true    | 현재 이미지 순서 표시 버튼. 클릭 시 해당 이미지로 슬라이드                                                                           |
+| props                | type                                | isRequired | default | description                                                                                                                                       |
+| -------------------- | ----------------------------------- | ---------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| items                | string[] \| { src: string}[]        | Required   |         | List of images to be used in the carousel.                                                                                                        |
+| width                | string                              | Optional   | '100%'  | Width of the carousel.                                                                                                                            |
+| height               | string                              | Optional   | '300px' | Height of the carousel.                                                                                                                           |
+| direction            | 'left' \| 'right' \| 'up' \| 'down' | Optional   | 'right' | Direction in which the images flow.                                                                                                               |
+| duration             | number                              | Optional   | 1000    | Duration of each slide (shorter values make it faster).                                                                                           |
+| interval             | number                              | Optional   | 0       | Auto slide interval for images (in ms). Set to 0 to disable auto sliding.                                                                         |
+| pauseAutoplayOnHover | boolean                             | Optional   | false   | When auto slide is enabled, pause the slide when the mouse is over an image. Resume auto slide when the mouse is moved outside the carousel area. |
+| showPrev             | boolean                             | Optional   | true    | Show previous button.                                                                                                                             |
+| showNext             | boolean                             | Optional   | true    | Show next button.                                                                                                                                 |
+| showDots             | boolean                             | Optional   | true    | Show buttons indicating the current image sequence. Click to slide to the corresponding image.                                                    |
 
 ## Events
 
