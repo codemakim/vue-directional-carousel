@@ -70,7 +70,7 @@ export default {
 
 | props                | type                                | isRequired | default | description                                                                                                                                       |
 | -------------------- | ----------------------------------- | ---------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| items                | string[] \| { src: string}[]        | Required   |         | List of images to be used in the carousel.                                                                                                        |
+| items                | string[] \| { src: string}[]        | `Required` |         | List of images to be used in the carousel.                                                                                                        |
 | width                | string                              | Optional   | '100%'  | Width of the carousel.                                                                                                                            |
 | height               | string                              | Optional   | '300px' | Height of the carousel.                                                                                                                           |
 | direction            | 'left' \| 'right' \| 'up' \| 'down' | Optional   | 'right' | Direction in which the images flow.                                                                                                               |
