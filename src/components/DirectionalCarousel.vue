@@ -37,7 +37,7 @@ const computedItems = computed(() =>
 )
 // 이미지 수
 const itemCount = computed(() => props.items.length)
-// 렌더링에 사용할 아이템 목록
+// 시ㄹ제 렌더링에 사용할 아이템 목록
 const renderItems = computed(() => [...computedItems.value, computedItems.value[0]])
 // 현재 보여지는 아이템 인덱스
 const currentIndex = ref(0)
@@ -157,7 +157,7 @@ const clickPrev = () => {
     initInterval()
   }
 }
-
+// dot 버튼 스타일 - 현제 화면에 표시되는 이미지의 인덱스에 따라 스타일 강조
 const dotStyles = computed(() =>
   new Array(itemCount.value)
     .fill({
