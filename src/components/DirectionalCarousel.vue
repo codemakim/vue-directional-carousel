@@ -29,19 +29,16 @@ const props = withDefaults(defineProps<VerticalCarouselProps>(), {
 
 // 캐러샐 영역의 너비
 const carouselContainer: Ref<HTMLElement | null> = ref(null)
-// 이미지 인덱스 표시 점 부분 엘리먼트
-const dotWrapper: Ref<HTMLElement | null> = ref(null)
 // items가 string[]인 경우 { src: string }[] 형식으로 변경합니다.
 const computedItems = computed(() =>
   props.items.map((el) => (typeof el === 'string' ? { src: el } : el))
 )
 // 이미지 수
 const itemCount = computed(() => props.items.length)
-// 시ㄹ제 렌더링에 사용할 아이템 목록
+// 실제 렌더링에 사용할 아이템 목록
 const renderItems = computed(() => [...computedItems.value, computedItems.value[0]])
 // 현재 보여지는 아이템 인덱스
 const currentIndex = ref(0)
-const dotWrapperHeight = computed(() => dotWrapper.value?.offsetHeight ?? 0)
 // 이동 거리 계산을 위한 너비 값
 const numberWidth = computed(() => carouselContainer.value?.offsetWidth ?? 0)
 // 이동 거리 계산을 위한 높이 값
@@ -375,7 +372,6 @@ const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
     </div>
     <div
       v-if="showDots"
-      ref="dotWrapper"
       :style="{
         display: 'flex',
         alignItems: 'center',
