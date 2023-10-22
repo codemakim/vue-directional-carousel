@@ -46,7 +46,7 @@ const dotStyles = computed(() =>
 )
 </script>
 <template>
-  <div v-if="showDots" :style="style">
+  <div :style="style">
     <div
       v-for="seq in itemCount"
       :style="{

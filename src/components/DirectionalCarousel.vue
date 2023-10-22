@@ -13,6 +13,8 @@ import {
   watch
 } from 'vue'
 import DotButtons from './DotButtons.vue'
+import PrevButton from './PrevButton.vue'
+import NextButton from './NextButton.vue'
 
 const TRANSLATE = 'translate'
 
@@ -216,36 +218,6 @@ onBeforeUnmount(() => {
   clearInterval(autoSlideInterval)
 })
 
-// button Wrapper CSS 스타일
-const buttonWrapperStyle: CSSProperties = {
-  zIndex: 1,
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  padding: '5px'
-}
-
-// button CSS 스타일
-const buttonStyle: Ref<CSSProperties> = ref({
-  height: '20px',
-  border: 'none',
-  color: 'silver',
-  borderRadius: '10px'
-})
-
-/**
- * button handler - mouse down
- */
-const onMouseDownButton = () => {
-  buttonStyle.value.color = 'gray'
-}
-/**
- * button handler - mouse up
- */
-const onMouseUpButton = () => {
-  buttonStyle.value.color = 'silver'
-}
-
 // 아이템 엘리먼트의 스타일
 const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
   overflow: 'hidden',
@@ -280,24 +252,7 @@ const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
       @mouseleave="resumeSlide"
       @focusout="resumeSlide"
     >
-      <div v-if="showPrev" :style="buttonWrapperStyle">
-        <button
-          class="prev-button"
-          :style="buttonStyle"
-          @click="clickPrev"
-          @mousedown="onMouseDownButton"
-        >
-          <img
-            alt="left arrow"
-            :src="'src/assets/arrow-point-to-right.png'"
-            :style="{
-              width: '10px',
-              borderRadius: '50%',
-              transform: 'scaleX(-1)'
-            }"
-          />
-        </button>
-      </div>
+      <prev-button v-if="showPrev" @click-prev-button="clickPrev" />
       <div
         ref="carouselContainer"
         :style="{
@@ -334,25 +289,9 @@ const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
           </div>
         </div>
       </div>
-      <div v-if="showNext" :style="buttonWrapperStyle">
-        <button
-          class="next-button"
-          :style="buttonStyle"
-          @click="clickNext"
-          @mouseup="onMouseUpButton"
-        >
-          <img
-            alt="left arrow"
-            :src="'src/assets/arrow-point-to-right.png'"
-            :style="{
-              width: '10px',
-              borderRadius: '3px'
-            }"
-          />
-        </button>
-      </div>
+      <next-button v-if="showNext" @click-next-button="clickNext" />
     </div>
-    <DotButtons
+    <dot-buttons
       v-if="showDots"
       :current-index="currentIndex"
       :item-count="itemCount"
