@@ -30,27 +30,35 @@ const props = withDefaults(defineProps<VerticalCarouselProps>(), {
   pauseAutoplayOnHover: false
 })
 
-// 캐러샐 영역의 너비
+// width of carousel area
 const carouselContainer: Ref<HTMLElement | null> = ref(null)
-// items가 string[]인 경우 { src: string }[] 형식으로 변경합니다.
+
+// In the case where items is of type string[],
+// it is transformed into the format { src: string }[]
 const computedItems = computed(() =>
   props.items.map((el) => (typeof el === 'string' ? { src: el } : el))
 )
-// 이미지 수
+// count of images
 const itemCount = computed(() => props.items.length)
-// 실제 렌더링에 사용할 아이템 목록
+
+// image list for rendering
 const renderItems = computed(() => [...computedItems.value, computedItems.value[0]])
-// 현재 보여지는 아이템 인덱스
+
+// current visible item index.
 const currentIndex = ref(0)
-// 이동 거리 계산을 위한 너비 값
+
+// Width value for calculating the movement distance
 const numberWidth = computed(() => carouselContainer.value?.offsetWidth ?? 0)
-// 이동 거리 계산을 위한 높이 값
+
+// Height value for calculating the movement distance
 const numberHeight = computed(() => carouselContainer.value?.offsetHeight ?? 0)
-// 축을 결정하는 값
+
+// Value determining the axis
 const axis = computed(() =>
   ['left', 'right'].includes(props.direction) ? numberWidth.value : numberHeight.value
 )
-// 거리를 결정하는 값
+
+// Value determining the distance
 const distinct = computed(() =>
   ['up', 'left'].includes(props.direction)
     ? currentIndex.value % renderItems.value.length
@@ -58,28 +66,28 @@ const distinct = computed(() =>
 )
 
 /**
- * direction 값이 right, up인 경우 인덱스에 따른 거리 값이 큰 수 부터 작은 수 순으로 출력됩니다.
- * direction 값이 left, right인 경우 width를 기준으로 거리 값을 계산하며,
+ * When the direction is right or up, the distance values are output from the largest to the smallest according to the index.
+ * When the direction is left or right, the distance is calculated based on the width.
  */
 const slideDistinct = computed(() => {
   return distinct.value * axis.value
 })
 
-// direction 값에 따른 축 값
+// Axis value based on the direction
 const directionAxis = computed(() => (['left', 'right'].includes(props.direction) ? 'X' : 'Y'))
 
-// 현재 화면에 표시되어야 하는 아이템의 인덱스를 이용해 만든 translate 값
+// Translate value created using the index of the items currently visible on the screen
 const itemsTranslate = computed(() => {
   return `${TRANSLATE}${directionAxis.value}(-${slideDistinct.value}px)`
 })
 
-// translate 동작 Duration 값 원본
+// default transition value
 const defaultTransition = ref(`transform ${props.duration / 1000}s ease`)
 
-// 초기화 과정에서 원본 ( defaultTransition )을 보존하기 위한 값
+// To preserve the original ( defaultTransition ) during initialization.
 const transition = ref(defaultTransition.value)
 
-// 전달 받은 방향 값을 이용해 flex-direction 속성 값을 반환합니다.
+// It returns the flex-direction property value based on the received direction.
 const direction = computed(() => props.direction)
 const flexDirection = computed(() => {
   switch (direction.value) {
@@ -95,7 +103,7 @@ const flexDirection = computed(() => {
 })
 
 /**
- * item에 현재 index에 맞는 translate 속성을 부여
+ * Applies the translate property to the item based on the current index.
  * @return void
  */
 const setTransition = () => {
@@ -104,7 +112,7 @@ const setTransition = () => {
 }
 
 /**
- * 아이템이 다음 순서로 슬라이드 동작하도록 하기 위한 이벤트 핸들러
+ * Event handler to make items slide to the next order.
  * @return void
  */
 const next = () => {
@@ -120,13 +128,17 @@ const next = () => {
 }
 
 /**
- * 인터벌을 초기화합니다. next, prev 버튼을 클릭하거나, 슬라이드 동작 재게될 때 호출됩니다.
+ * The translation for the phrase.
+ * Reset the interval when next or prev buttons are clicked or when the slide action is resumed.
  */
 const initInterval = () => {
   clearInterval(autoSlideInterval)
   autoSlideInterval = setInterval(next, props.interval)
 }
 
+/**
+ * click next button event handler
+ */
 const clickNext = () => {
   next()
   if (props.interval) {
@@ -134,12 +146,13 @@ const clickNext = () => {
   }
 }
 
+// index of previous item
 const prevIndex = computed(
   () => (currentIndex.value - 1 + renderItems.value.length) % renderItems.value.length
 )
 
 /**
- * 아이템이 이전 순서로 슬라이드 동작하도록 하기 위한 이벤트 핸들러
+ * click prev button event handler
  * @return void
  */
 const clickPrev = () => {
@@ -159,7 +172,7 @@ const clickPrev = () => {
 }
 
 /**
- * dot button 클릭 핸들러
+ * clicked dot button event handler
  */
 const clickDot = (index: number) => {
   currentIndex.value = index
@@ -168,7 +181,7 @@ const clickDot = (index: number) => {
   }
 }
 
-// setIntervaldl 담길 변수
+// variables of setInterval
 let autoSlideInterval: number
 
 const watchItems = computed(() => computedItems.value)
@@ -186,7 +199,7 @@ watch([watchItems, watchInterval], () => {
 const isPaused = ref(false)
 
 /**
- * 슬라이드 동작 일시 정지
+ * Pause slide action
  * @return void
  */
 const pauseSlide = () => {
@@ -197,7 +210,7 @@ const pauseSlide = () => {
 }
 
 /**
- * 슬라이드 동작 재게
+ * Resume slide action
  * @return void
  */
 const resumeSlide = () => {
