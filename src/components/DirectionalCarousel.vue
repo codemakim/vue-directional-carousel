@@ -12,6 +12,7 @@ import {
   onBeforeUnmount,
   watch
 } from 'vue'
+import DotButtons from './DotButtons.vue'
 
 const TRANSLATE = 'translate'
 
@@ -154,25 +155,6 @@ const clickPrev = () => {
     initInterval()
   }
 }
-// dot 버튼 스타일 - 현제 화면에 표시되는 이미지의 인덱스에 따라 스타일 강조
-const dotStyles = computed(() =>
-  new Array(itemCount.value)
-    .fill({
-      border: 'none',
-      borderRadius: '50%',
-      backgroundColor: 'gray',
-      cursor: 'pointer'
-    })
-    .map((el, index) => {
-      const isCurrent = index === (itemCount.value > currentIndex.value ? currentIndex.value : 0)
-      return {
-        ...el,
-        opacity: isCurrent ? '1' : '0.5',
-        height: isCurrent ? '8px' : '6px',
-        paddingInline: isCurrent ? '4px' : '3px'
-      }
-    })
-)
 
 /**
  * dot button 클릭 핸들러
@@ -370,23 +352,12 @@ const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
         </button>
       </div>
     </div>
-    <div
+    <DotButtons
       v-if="showDots"
-      :style="{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexWrap: 'wrap'
-      }"
-    >
-      <div
-        v-for="seq in itemCount"
-        :style="{
-          padding: '0px 4px 0px 4px'
-        }"
-      >
-        <button :style="dotStyles[seq - 1]" @click="clickDot(seq - 1)" />
-      </div>
-    </div>
+      :current-index="currentIndex"
+      :item-count="itemCount"
+      :show-dots="showDots"
+      @click-dot-button="clickDot"
+    />
   </div>
 </template>

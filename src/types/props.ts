@@ -12,3 +12,9 @@ export interface VerticalCarouselProps {
   interval?: number
   pauseAutoplayOnHover?: boolean
 }
+
+export interface DotButtonsProps {
+  currentIndex: number
+  itemCount: number
+  showDots: boolean
+}
