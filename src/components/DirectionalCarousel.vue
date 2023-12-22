@@ -132,8 +132,8 @@ const next = () => {
  * Reset the interval when next or prev buttons are clicked or when the slide action is resumed.
  */
 const initInterval = () => {
-  clearInterval(autoSlideInterval)
-  autoSlideInterval = setInterval(next, props.interval)
+  window.clearInterval(autoSlideInterval)
+  autoSlideInterval = window.setInterval(next, props.interval)
 }
 
 /**
@@ -189,9 +189,9 @@ const watchInterval = computed(() => props.interval)
 
 watch([watchItems, watchInterval], () => {
   if (watchInterval.value) {
-    clearInterval(autoSlideInterval)
+    window.clearInterval(autoSlideInterval)
     if (watchItems.value.length > 1) {
-      autoSlideInterval = setInterval(next, watchInterval.value)
+      autoSlideInterval = window.setInterval(next, watchInterval.value)
     }
   }
 })
@@ -204,7 +204,7 @@ const isPaused = ref(false)
  */
 const pauseSlide = () => {
   if (props.pauseAutoplayOnHover) {
-    clearInterval(autoSlideInterval)
+    window.clearInterval(autoSlideInterval)
     isPaused.value = true
   }
 }
@@ -223,12 +223,12 @@ const resumeSlide = () => {
 onMounted(() => {
   transition.value = ''
   if (computedItems.value.length > 1 && props.interval) {
-    autoSlideInterval = setInterval(next, props.interval)
+    autoSlideInterval = window.setInterval(next, props.interval)
   }
 })
 
 onBeforeUnmount(() => {
-  clearInterval(autoSlideInterval)
+  window.clearInterval(autoSlideInterval)
 })
 
 // 아이템 엘리먼트의 스타일
