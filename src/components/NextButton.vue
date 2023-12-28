@@ -18,7 +18,7 @@ const clickNext = () => {
     <button class="next-button" :style="buttonStyle" @click="clickNext" @mouseup="onMouseUpButton">
       <img
         alt="left arrow"
-        :src="'src/assets/arrow-point-to-right.png'"
+        :src="'../../assets/arrow-point-to-right.png'"
         :style="{
           width: '10px',
           borderRadius: '3px'
@@ -27,4 +27,3 @@ const clickNext = () => {
     </button>
   </div>
 </template>
-../composable/arrowStyle

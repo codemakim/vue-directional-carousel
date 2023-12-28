@@ -23,7 +23,7 @@ const clickPrev = () => {
     >
       <img
         alt="left arrow"
-        :src="'src/assets/arrow-point-to-right.png'"
+        :src="'../../assets/arrow-point-to-right.png'"
         :style="{
           width: '10px',
           borderRadius: '50%',
