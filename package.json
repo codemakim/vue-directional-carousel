@@ -4,7 +4,7 @@
   },
   "private": false,
   "name": "vue-directional-carousel",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "This is a Vue 3 component that allows you to set the direction of image movement not only vertically and horizontally but also in different directions (left, right, up, down).",
   "keywords": [
     "vue",
