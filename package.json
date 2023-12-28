@@ -24,7 +24,7 @@
     ".": {
       "import": "./dist/directional-carousel.js",
       "require": "./dist/directional-carousel.umd.js",
-      "types": "./dist/types/main.d.ts"
+      "types": "./dist/main.d.ts"
     }
   },
   "license": "MIT",
@@ -52,7 +52,7 @@
     "vue-tsc": "^1.8.6"
   },
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && vue-tsc --emitDeclarationOnly",
     "build-only": "vite build",
     "dev": "vite",
     "format": "prettier --write src/",
