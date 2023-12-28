@@ -1,2 +1,4 @@
-/src/App.vue
-/src/assets/sampleImage/
+node_modules/
+src/
+public/
+tsconfig.json

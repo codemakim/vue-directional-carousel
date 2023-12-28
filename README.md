@@ -21,7 +21,7 @@ yarn install vue-directional-carousel
 - Import the VueDirectionalCarousel component in your Vue.js project:
 
 ```javascript
-import { DirectionalCarousel } from 'vue-directional-carousel'
+import DirectionalCarousel from 'vue-directional-carousel'
 ```
 
 - Register the VueDirectionalCarousel component locally in your component:
