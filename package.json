@@ -2,7 +2,7 @@
   "peerDependencies": {
     "vue": "^3.3.4"
   },
-  "private": true,
+  "private": false,
   "name": "vue-directional-carousel",
   "version": "0.0.1",
   "description": "This is a Vue 3 component that allows you to set the direction of image movement not only vertically and horizontally but also in different directions (left, right, up, down).",
@@ -58,6 +58,8 @@
     "format": "prettier --write src/",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "preview": "vite preview",
-    "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false"
+    "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
+    "prepack": "cp package.json dist/package.json",
+    "pack": "npm run prepack && npm pack"
   }
 }
