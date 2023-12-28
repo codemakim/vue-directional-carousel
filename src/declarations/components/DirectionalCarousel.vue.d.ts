@@ -12,7 +12,7 @@ declare const _default: __VLS_WithTemplateSlots<import("vue").DefineComponent<{
         default: string;
     };
     items: {
-        type: import("vue").PropType<import("../types/props").VerticalCarouselItem[]>;
+        type: import("vue").PropType<import("../propTypes/props").VerticalCarouselItem[]>;
         required: true;
     };
     direction: {
@@ -53,7 +53,7 @@ declare const _default: __VLS_WithTemplateSlots<import("vue").DefineComponent<{
         default: string;
     };
     items: {
-        type: import("vue").PropType<import("../types/props").VerticalCarouselItem[]>;
+        type: import("vue").PropType<import("../propTypes/props").VerticalCarouselItem[]>;
         required: true;
     };
     direction: {

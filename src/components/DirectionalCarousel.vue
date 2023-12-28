@@ -1,7 +1,7 @@
 <!-- eslint-disable vue/no-setup-props-destructure -->
 
 <script setup lang="ts">
-import { type VerticalCarouselProps } from '../types/props'
+import { type VerticalCarouselProps } from '../propTypes/props'
 import {
   type Ref,
   type ComputedRef,

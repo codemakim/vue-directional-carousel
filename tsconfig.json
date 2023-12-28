@@ -1,14 +1,6 @@
 {
-  "files": [],
-  "references": [
-    {
-      "path": "./tsconfig.node.json"
-    }
-    // {
-    //   "path": "./tsconfig.app.json"
-    // }
-  ],
   "compilerOptions": {
+    "types": ["vite/client", "vue"],
     "target": "esnext",
     "module": "esnext",
     "moduleResolution": "node",
@@ -19,7 +11,7 @@
     "strict": true,
     "isolatedModules": true,
     "declaration": true,
-    "declarationDir": "src/declarations",
+    "declarationDir": "./dist/types",
     "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts"],

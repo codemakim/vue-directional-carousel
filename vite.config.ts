@@ -14,18 +14,14 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/lib/main.ts'),
-      name: 'DirectionalCacrousel',
-      // the proper extensions will be added
-      fileName: 'directional-carousel'
+      entry: 'src/components/DirectionalCarousel.vue',
+      name: 'VueDirectionalCarousel'
     },
     rollupOptions: {
-      // make sure to externalize deps that shouldn't be bundled
-      // into your library
-      external: ['vue'],
+      // 이곳에 추가적인 rollup 설정이 필요하다면 넣어줄 수 있습니다.
+      external: ['vue'], // 외부 의존성으로 Vue를 사용한다면 여기에 추가
       output: {
-        // Provide global variables to use in the UMD build
-        // for externalized deps
+        // UMD 빌드 설정
         globals: {
           vue: 'Vue'
         }

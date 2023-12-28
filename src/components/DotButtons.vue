@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { type Ref, type CSSProperties, ref, computed } from 'vue'
-import { type DotButtonsProps } from '../types/props'
+import { type DotButtonsProps } from '../propTypes/props'
 
 const emit = defineEmits(['click-dot-button'])
 
