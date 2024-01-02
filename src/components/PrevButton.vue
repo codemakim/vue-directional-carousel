@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useArrowStyle } from '../composable/arrowStyle'
+import arrowImage from '@/assets/arrow-point-to-right.png';
 
 const emit = defineEmits(['click-prev-button'])
 
@@ -23,7 +24,7 @@ const clickPrev = () => {
     >
       <img
         alt="left arrow"
-        :src="'../../assets/arrow-point-to-right.png'"
+        :src="arrowImage"
         :style="{
           width: '10px',
           borderRadius: '50%',
