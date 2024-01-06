@@ -85,6 +85,41 @@ export default {
 
 추후 기능 추가 예정
 
+## Slots
+
+### item
+
+Use Slot 'item' in your component:
+
+```javascript
+const items = ref([
+  {
+    title: "제목1",
+    url: "google.com",
+  }, {
+    title: "제목2",
+    url: "ahnlab.com",
+  },
+]);
+
+<DirectionalCarousel
+    :items="items"
+    direction="down"
+    height="50px"
+    width="400px"
+    :show-next="true"
+    :show-prev="true"
+    :interval="2000"
+    :pause-autoplay-on-hover="true"
+  >
+    <template #item="item">
+      <div :style="{ backgroundColor: 'white', color: 'black', height: '100%', width: '100%' }">
+        {{ item.title }} / {{ item.url }}
+      </div>
+    </template>
+  </DirectionalCarousel>
+```
+
 ## Contributing
 
 ## License

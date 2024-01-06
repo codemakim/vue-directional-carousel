@@ -141,7 +141,7 @@ const initInterval = () => {
  */
 const clickNext = () => {
   next()
-  if (props.interval) {
+  if (props.interval && props.items.length > 1) {
     initInterval()
   }
 }
@@ -166,7 +166,7 @@ const clickPrev = () => {
   } else {
     currentIndex.value = prevIndex.value
   }
-  if (props.interval) {
+  if (props.interval && props.items.length > 1) {
     initInterval()
   }
 }
@@ -214,7 +214,7 @@ const pauseSlide = () => {
  * @return void
  */
 const resumeSlide = () => {
-  if (props.pauseAutoplayOnHover && isPaused.value) {
+  if (props.pauseAutoplayOnHover && isPaused.value && props.items.length > 1) {
     initInterval()
     isPaused.value = false
   }

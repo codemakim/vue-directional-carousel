@@ -12,7 +12,7 @@ const items = ref([
   'src/assets/sampleImage/carousel_image.jpg',
   'src/assets/sampleImage/carousel_image.jpg',
   'src/assets/sampleImage/carousel_image.jpg',
-  'src/assets/sampleImage/carousel_image.jpg'
+  'src/assets/sampleImage/carousel_image.jpg',
 ])
 </script>
 
@@ -27,6 +27,7 @@ const items = ref([
       :show-next="true"
       :show-dots="true"
       :interval="2000"
+      :pause-autoplay-on-hover="true"
     >
     </DirectionalCarousel>
   </div>
