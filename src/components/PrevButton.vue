@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useArrowStyle } from '../composable/arrowStyle'
-import arrowImage from '@/assets/arrow-point-to-right.png';
+import arrowImage from '@/assets/arrow-point-to-right.png'
 
 const emit = defineEmits(['click-prev-button'])
 

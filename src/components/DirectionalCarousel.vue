@@ -12,7 +12,7 @@ import {
   onBeforeUnmount,
   watch
 } from 'vue'
-import DotButtons from './DotButtons.vue'
+import DotButtons from '@/components/DotButtons.vue'
 import PrevButton from './PrevButton.vue'
 import NextButton from './NextButton.vue'
 
