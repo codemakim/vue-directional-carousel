@@ -1,5 +1,10 @@
 export type VerticalCarouselItem = string | { src: string }
 
+export type ArrowOptions = {
+  show?: boolean
+  image?: string
+}
+
 export interface VerticalCarouselProps {
   width?: string
   height?: string
@@ -10,10 +15,14 @@ export interface VerticalCarouselProps {
   showNext?: boolean
   showDots?: boolean
   interval?: number
+  arrowOptions?: {
+    prev: ArrowOptions,
+    next: ArrowOptions
+  }
   pauseAutoplayOnHover?: boolean
 }
 
-export interface DotButtonsProps {
+export type DotButtonsProps = {
   currentIndex: number
   itemCount: number
   showDots: boolean

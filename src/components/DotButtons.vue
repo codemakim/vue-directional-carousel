@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { type Ref, type CSSProperties, ref, computed } from 'vue'
-import { type DotButtonsProps } from '../propTypes/props'
+import { type DotButtonsProps } from '../types/props'
 
 const emit = defineEmits(['click-dot-button'])
 
@@ -56,4 +56,4 @@ const dotStyles = computed(() =>
       <button :style="dotStyles[seq - 1]" @click="clickDot(seq)" />
     </div>
   </div>
-</template>
+</template>../types/props

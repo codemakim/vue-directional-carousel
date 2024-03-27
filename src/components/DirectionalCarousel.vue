@@ -1,7 +1,7 @@
 <!-- eslint-disable vue/no-setup-props-destructure -->
 
 <script setup lang="ts">
-import { type VerticalCarouselProps } from '../propTypes/props'
+import { type VerticalCarouselProps } from '../types/props'
 import {
   type Ref,
   type ComputedRef,
@@ -265,7 +265,7 @@ const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
       @mouseleave="resumeSlide"
       @focusout="resumeSlide"
     >
-      <prev-button v-if="showPrev" @click-prev-button="clickPrev" />
+      <prev-button v-if="arrowOptions?.prev.show || showPrev" @click-prev-button="clickPrev" />
       <div
         ref="carouselContainer"
         :style="{
@@ -293,7 +293,7 @@ const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
             <slot name="item" v-bind="item" :style="{ width, height }">
               <img
                 :src="item.src"
-                :alt="`directiional-carousel-image-${index}`"
+                :alt="`directiional-carousel-item-${index}`"
                 :style="{
                   width: '100%'
                 }"
@@ -302,7 +302,7 @@ const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
           </div>
         </div>
       </div>
-      <next-button v-if="showNext" @click-next-button="clickNext" />
+      <next-button v-if="arrowOptions?.next.show || showNext" @click-next-button="clickNext" />
     </div>
     <dot-buttons
       v-if="showDots"
@@ -312,4 +312,4 @@ const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
       @click-dot-button="clickDot"
     />
   </div>
-</template>
+</template>../types/props
