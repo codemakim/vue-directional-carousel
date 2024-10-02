@@ -1,4 +1,8 @@
+import { type ComputedRef } from "vue"
+
 export type VerticalCarouselItem = string | { src: string }
+
+export type CarouselComputedItemsType = ComputedRef<{ src: string }[]>
 
 export type ArrowOptions = {
   show?: boolean

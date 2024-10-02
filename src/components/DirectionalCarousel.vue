@@ -8,15 +8,12 @@ import {
   type CSSProperties,
   ref,
   computed,
-  onMounted,
-  onBeforeUnmount,
-  watch
 } from 'vue'
 import DotButtons from '@/components/DotButtons.vue'
 import PrevButton from './PrevButton.vue'
 import NextButton from './NextButton.vue'
-
-const TRANSLATE = 'translate'
+import useRenderTransition from '@/composable/renderTransition'
+import useCarouselEvent from '@/composable/carouselEvent'
 
 const props = withDefaults(defineProps<VerticalCarouselProps>(), {
   width: '100%',
@@ -53,39 +50,20 @@ const numberWidth = computed(() => carouselContainer.value?.offsetWidth ?? 0)
 // Height value for calculating the movement distance
 const numberHeight = computed(() => carouselContainer.value?.offsetHeight ?? 0)
 
-// Value determining the axis
-const axis = computed(() =>
-  ['left', 'right'].includes(props.direction) ? numberWidth.value : numberHeight.value
-)
+// 컴포저블로 대체한 렌더링 관련 친구들 추가
+const {
+  itemsTranslate,
+  defaultTransition,
+  transition,
+  } = useRenderTransition(props, renderItems, currentIndex, numberWidth, numberHeight)
 
-// Value determining the distance
-const distinct = computed(() =>
-  ['up', 'left'].includes(props.direction)
-    ? currentIndex.value % renderItems.value.length
-    : renderItems.value.length - (currentIndex.value + (1 % renderItems.value.length))
-)
-
-/**
- * When the direction is right or up, the distance values are output from the largest to the smallest according to the index.
- * When the direction is left or right, the distance is calculated based on the width.
- */
-const slideDistinct = computed(() => {
-  return distinct.value * axis.value
-})
-
-// Axis value based on the direction
-const directionAxis = computed(() => (['left', 'right'].includes(props.direction) ? 'X' : 'Y'))
-
-// Translate value created using the index of the items currently visible on the screen
-const itemsTranslate = computed(() => {
-  return `${TRANSLATE}${directionAxis.value}(-${slideDistinct.value}px)`
-})
-
-// default transition value
-const defaultTransition = ref(`transform ${props.duration / 1000}s ease`)
-
-// To preserve the original ( defaultTransition ) during initialization.
-const transition = ref(defaultTransition.value)
+const {
+  clickNext,
+  clickPrev,
+  clickDot,
+  pauseSlide,
+  resumeSlide,
+} = useCarouselEvent(props, computedItems, renderItems, currentIndex, defaultTransition, transition)
 
 // It returns the flex-direction property value based on the received direction.
 const direction = computed(() => props.direction)
@@ -100,135 +78,6 @@ const flexDirection = computed(() => {
     default:
       return 'row-reverse'
   }
-})
-
-/**
- * Applies the translate property to the item based on the current index.
- * @return void
- */
-const setTransition = () => {
-  currentIndex.value = ++currentIndex.value % renderItems.value.length
-  transition.value = defaultTransition.value
-}
-
-/**
- * Event handler to make items slide to the next order.
- * @return void
- */
-const next = () => {
-  if (currentIndex.value >= renderItems.value.length - 1) {
-    transition.value = ''
-    currentIndex.value = 0
-    setTimeout(() => {
-      setTransition()
-    }, 100)
-  } else {
-    setTransition()
-  }
-}
-
-/**
- * The translation for the phrase.
- * Reset the interval when next or prev buttons are clicked or when the slide action is resumed.
- */
-const initInterval = () => {
-  window.clearInterval(autoSlideInterval)
-  autoSlideInterval = window.setInterval(next, props.interval)
-}
-
-/**
- * click next button event handler
- */
-const clickNext = () => {
-  next()
-  if (props.interval && props.items.length > 1) {
-    initInterval()
-  }
-}
-
-// index of previous item
-const prevIndex = computed(
-  () => (currentIndex.value - 1 + renderItems.value.length) % renderItems.value.length
-)
-
-/**
- * click prev button event handler
- * @return void
- */
-const clickPrev = () => {
-  if (currentIndex.value === 0) {
-    transition.value = ''
-    currentIndex.value = prevIndex.value
-    setTimeout(() => {
-      currentIndex.value = prevIndex.value
-      transition.value = defaultTransition.value
-    }, 100)
-  } else {
-    currentIndex.value = prevIndex.value
-  }
-  if (props.interval && props.items.length > 1) {
-    initInterval()
-  }
-}
-
-/**
- * clicked dot button event handler
- */
-const clickDot = (index: number) => {
-  currentIndex.value = index
-  if (props.interval) {
-    initInterval()
-  }
-}
-
-// variables of setInterval
-let autoSlideInterval: number
-
-const watchItems = computed(() => computedItems.value)
-const watchInterval = computed(() => props.interval)
-
-watch([watchItems, watchInterval], () => {
-  if (watchInterval.value) {
-    window.clearInterval(autoSlideInterval)
-    if (watchItems.value.length > 1) {
-      autoSlideInterval = window.setInterval(next, watchInterval.value)
-    }
-  }
-})
-
-const isPaused = ref(false)
-
-/**
- * Pause slide action
- * @return void
- */
-const pauseSlide = () => {
-  if (props.pauseAutoplayOnHover) {
-    window.clearInterval(autoSlideInterval)
-    isPaused.value = true
-  }
-}
-
-/**
- * Resume slide action
- * @return void
- */
-const resumeSlide = () => {
-  if (props.pauseAutoplayOnHover && isPaused.value && props.items.length > 1) {
-    initInterval()
-    isPaused.value = false
-  }
-}
-
-onMounted(() => {
-  transition.value = ''
-  if (computedItems.value.length > 1 && props.interval) {
-    autoSlideInterval = window.setInterval(next, props.interval)
-  }
-})
-
-onBeforeUnmount(() => {
-  window.clearInterval(autoSlideInterval)
 })
 
 // 아이템 엘리먼트의 스타일
@@ -312,4 +161,4 @@ const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
       @click-dot-button="clickDot"
     />
   </div>
-</template>../types/props
+</template>
