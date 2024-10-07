@@ -89,6 +89,10 @@ const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
   justifyContent: 'center',
   alignItems: 'center'
 }))
+
+defineExpose({
+  currentIndex,
+})
 </script>
 <template>
   <div
