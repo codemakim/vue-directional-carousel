@@ -3,9 +3,13 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import ViteImagesPlugin from 'vite-plugin-vue-images';
+import dts from 'vite-plugin-dts'
 
 export default defineConfig({
-  plugins: [vue(), ViteImagesPlugin()],
+  plugins: [vue(), ViteImagesPlugin(), dts({
+    rollupTypes: true,
+    tsconfigPath: './tsconfig.app.json'
+  })],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
@@ -17,7 +21,7 @@ export default defineConfig({
       name: 'VueDirectionalCarousel',
     },
     rollupOptions: {
-      external: ['vue', 'tests/**'],
+      external: ['vue'],
       output: {
         globals: {
           vue: 'Vue',
