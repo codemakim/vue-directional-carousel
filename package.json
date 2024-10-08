@@ -23,7 +23,8 @@
   "exports": {
     ".": {
       "import": "./dist/vue-directional-carousel.js",
-      "require": "./dist/vue-directional-carousel.umd.js"
+      "require": "./dist/vue-directional-carousel.umd.js",
+      "types": "./dist/index.d.ts"
     }
   },
   "license": "MIT",
@@ -63,7 +64,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "preview": "vite preview",
     "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
-    "prepack": "cp package.json dist/package.json && cp dist/index.d.ts dist/main.d.ts",
+    "prepack": "cp package.json dist/package.json",
     "pack": "npm run prepack && npm pack",
     "test": "vitest"
   }
