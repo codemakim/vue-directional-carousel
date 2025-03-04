@@ -1,6 +1,6 @@
 // src/tests/DirectionalCarousel.test.ts
 import { flushPromises, mount } from '@vue/test-utils';
-import DirectionalCarousel from 'src/components/DirectionalCarousel.vue';
+import DirectionalCarousel from '@/components/DirectionalCarousel.vue';
 import { describe, it, expect } from 'vitest';
 
 describe('DirectionalCarousel.vue', () => {

@@ -1,4 +1,4 @@
-import { computed, ref, type Ref, watch, onMounted, onBeforeUnmount } from 'vue'
+import { computed, ref, type Ref, watch, onMounted, onBeforeUnmount, onScopeDispose } from 'vue'
 import { type VerticalCarouselProps, type CarouselComputedItemsType } from '@/types/props';
 
 export default function useCarouselEvent(
@@ -8,7 +8,11 @@ export default function useCarouselEvent(
   currentIndex: Ref<number>,
   defaultTransition: Ref<string>,
   transition: Ref<string>,
+  isTransitioning: Ref<boolean>,
 ) {
+  // interval ID를 저장할 ref
+  const autoSlideInterval = ref<number | null>(null)
+  const isPaused = ref(false)
 
   /**
    * Applies the translate property to the item based on the current index.
@@ -24,24 +28,46 @@ export default function useCarouselEvent(
    * @return void
    */
   const next = () => {
+    if (isTransitioning.value) return
+
     if (currentIndex.value >= renderItems.value.length - 1) {
+      isTransitioning.value = true
       transition.value = ''
       currentIndex.value = 0
-      setTimeout(() => {
-        setTransition()
-      }, 100)
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          transition.value = defaultTransition.value
+          currentIndex.value = 1
+
+          setTimeout(() => {
+            isTransitioning.value = false
+          }, props.duration || 1000)
+        })
+      })
     } else {
       setTransition()
     }
   }
 
   /**
-   * The translation for the phrase.
-   * Reset the interval when next or prev buttons are clicked or when the slide action is resumed.
+   * Clears the existing interval if it exists
+   */
+  const clearExistingInterval = () => {
+    if (autoSlideInterval.value !== null) {
+      window.clearInterval(autoSlideInterval.value)
+      autoSlideInterval.value = null
+    }
+  }
+
+  /**
+   * Initializes the auto slide interval
    */
   const initInterval = () => {
-    window.clearInterval(autoSlideInterval)
-    autoSlideInterval = window.setInterval(next, props.interval)
+    clearExistingInterval()
+    if (props.interval && props.items.length > 1 && !isPaused.value) {
+      autoSlideInterval.value = window.setInterval(next, props.interval)
+    }
   }
 
   /**
@@ -64,16 +90,23 @@ export default function useCarouselEvent(
    * @return void
    */
   const clickPrev = () => {
+    if (isTransitioning.value) return
+
     if (currentIndex.value === 0) {
+      isTransitioning.value = true
       transition.value = ''
       currentIndex.value = prevIndex.value
       setTimeout(() => {
         currentIndex.value = prevIndex.value
         transition.value = defaultTransition.value
+        setTimeout(() => {
+          isTransitioning.value = false
+        }, props.duration || 1000)
       }, 100)
     } else {
       currentIndex.value = prevIndex.value
     }
+
     if (props.interval && props.items.length > 1) {
       initInterval()
     }
@@ -83,28 +116,27 @@ export default function useCarouselEvent(
    * clicked dot button event handler
    */
   const clickDot = (index: number) => {
+    if (isTransitioning.value) return
+
     currentIndex.value = index
     if (props.interval) {
       initInterval()
     }
   }
 
-  // variables of setInterval
-  let autoSlideInterval: number
-
-  const watchItems = computed(() => computedItems.value)
-  const watchInterval = computed(() => props.interval)
-
-  watch([watchItems, watchInterval], () => {
-    if (watchInterval.value) {
-      window.clearInterval(autoSlideInterval)
-      if (watchItems.value.length > 1) {
-        autoSlideInterval = window.setInterval(next, watchInterval.value)
-      }
-    }
-  })
-
-  const isPaused = ref(false)
+  // Watch for changes in relevant props
+  watch(
+    () => [
+      props.interval,
+      props.direction,
+      props.items.length,
+      props.pauseAutoplayOnHover
+    ],
+    () => {
+      initInterval()
+    },
+    { deep: true }
+  )
 
   /**
    * Pause slide action
@@ -112,8 +144,8 @@ export default function useCarouselEvent(
    */
   const pauseSlide = () => {
     if (props.pauseAutoplayOnHover) {
-      window.clearInterval(autoSlideInterval)
       isPaused.value = true
+      clearExistingInterval()
     }
   }
 
@@ -122,21 +154,26 @@ export default function useCarouselEvent(
    * @return void
    */
   const resumeSlide = () => {
-    if (props.pauseAutoplayOnHover && isPaused.value && props.items.length > 1) {
-      initInterval()
+    if (props.pauseAutoplayOnHover && props.items.length > 1) {
       isPaused.value = false
+      initInterval()
     }
   }
 
+  // Component lifecycle hooks
   onMounted(() => {
     transition.value = ''
-    if (computedItems.value.length > 1 && props.interval) {
-      autoSlideInterval = window.setInterval(next, props.interval)
+    if (props.interval && props.items.length > 1) {
+      initInterval()
     }
   })
 
   onBeforeUnmount(() => {
-    window.clearInterval(autoSlideInterval)
+    clearExistingInterval()
+  })
+
+  onScopeDispose(() => {
+    clearExistingInterval()
   })
 
   return {

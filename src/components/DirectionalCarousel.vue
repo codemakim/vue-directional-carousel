@@ -1,19 +1,21 @@
 <!-- eslint-disable vue/no-setup-props-destructure -->
 
 <script setup lang="ts">
-import { type VerticalCarouselProps } from '../types/props'
+import { type VerticalCarouselProps, type DirectionProps, validateCarouselProps } from '../types/props'
 import {
   type Ref,
   type ComputedRef,
   type CSSProperties,
   ref,
   computed,
+  watch
 } from 'vue'
 import DotButtons from '@/components/DotButtons.vue'
 import PrevButton from './PrevButton.vue'
 import NextButton from './NextButton.vue'
 import useRenderTransition from '@/composable/renderTransition'
 import useCarouselEvent from '@/composable/carouselEvent'
+import useImageLoading from '@/composable/imageLoading'
 
 const props = withDefaults(defineProps<VerticalCarouselProps>(), {
   width: '100%',
@@ -26,6 +28,22 @@ const props = withDefaults(defineProps<VerticalCarouselProps>(), {
   interval: 0,
   pauseAutoplayOnHover: false
 })
+
+// props 변경 감지하여 유효성 검사
+watch(
+  () => ({
+    items: props.items,
+    interval: props.interval,
+    duration: props.duration
+  }),
+  () => {
+    const validationResult = validateCarouselProps(props)
+    if (validationResult !== true) {
+      console.error(`DirectionalCarousel: ${validationResult}`)
+    }
+  },
+  { immediate: true }
+)
 
 // width of carousel area
 const carouselContainer: Ref<HTMLElement | null> = ref(null)
@@ -55,7 +73,9 @@ const {
   itemsTranslate,
   defaultTransition,
   transition,
-  } = useRenderTransition(props, renderItems, currentIndex, numberWidth, numberHeight)
+  isTransitioning,
+  directionProps
+} = useRenderTransition(props, renderItems, currentIndex, numberWidth, numberHeight)
 
 const {
   clickNext,
@@ -63,22 +83,15 @@ const {
   clickDot,
   pauseSlide,
   resumeSlide,
-} = useCarouselEvent(props, computedItems, renderItems, currentIndex, defaultTransition, transition)
-
-// It returns the flex-direction property value based on the received direction.
-const direction = computed(() => props.direction)
-const flexDirection = computed(() => {
-  switch (direction.value) {
-    case 'left':
-      return 'row'
-    case 'up':
-      return 'column'
-    case 'down':
-      return 'column-reverse'
-    default:
-      return 'row-reverse'
-  }
-})
+} = useCarouselEvent(
+  props, 
+  computedItems, 
+  renderItems, 
+  currentIndex, 
+  defaultTransition, 
+  transition,
+  isTransitioning
+)
 
 // 아이템 엘리먼트의 스타일
 const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
@@ -89,6 +102,13 @@ const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
   justifyContent: 'center',
   alignItems: 'center'
 }))
+
+const {
+  loadingStates,
+  errorStates,
+  loadedImages,
+  preloadImage
+} = useImageLoading(currentIndex, computedItems)
 
 defineExpose({
   currentIndex,
@@ -132,9 +152,10 @@ defineExpose({
           :style="{
             display: 'inline-flex',
             position: 'relative',
-            flexDirection: flexDirection,
+            flexDirection: directionProps.flexDirection,
             transform: itemsTranslate,
-            transition: transition
+            transition: transition,
+            pointerEvents: isTransitioning ? 'none' : 'auto'
           }"
         >
           <div
@@ -144,13 +165,36 @@ defineExpose({
             class="carousel-item"
           >
             <slot name="item" v-bind="item" :style="{ width, height }">
-              <img
-                :src="item.src"
-                :alt="`directiional-carousel-item-${index}`"
-                :style="{
-                  width: '100%'
-                }"
-              />
+              <div class="carousel-image-container" :style="{ width: '100%', height: '100%' }">
+                <!-- State of loading -->
+                <div v-if="loadingStates.get(item.src)" class="carousel-image-loading">
+                  <slot name="loading">
+                    <div class="loading-spinner"></div>
+                  </slot>
+                </div>
+                
+                <!-- State of error -->
+                <div v-else-if="errorStates.get(item.src)" class="carousel-image-error">
+                  <slot name="error">
+                    <div class="error-fallback">
+                      <span>Failed to load image</span>
+                    </div>
+                  </slot>
+                </div>
+                
+                <!-- State of success -->
+                <img
+                  v-else
+                  :src="item.src"
+                  :alt="`directional-carousel-item-${index}`"
+                  :style="{
+                    width: '100%',
+                    opacity: loadedImages.has(item.src) ? 1 : 0,
+                    transition: 'opacity 0.2s'
+                  }"
+                  @load="loadedImages.add(item.src)"
+                />
+              </div>
             </slot>
           </div>
         </div>
@@ -166,3 +210,43 @@ defineExpose({
     />
   </div>
 </template>
+
+<style scoped>
+.carousel-image-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.carousel-image-loading,
+.carousel-image-error {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading-spinner {
+  /* 로딩 스피너 스타일 */
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.error-fallback {
+  padding: 1rem;
+  text-align: center;
+  background-color: #f8f9fa;
+  color: #dc3545;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>

@@ -1,10 +1,8 @@
 import { computed, ref, type Ref, type ComputedRef } from 'vue'
-import { type VerticalCarouselProps, type CarouselComputedItemsType } from '@/types/props';
+import { type VerticalCarouselProps, type CarouselComputedItemsType, type Direction, DirectionProps } from '@/types/props'
 
-const DEFAULT_DIRECTION = 'right';
-const DEFAULT_DURATION = 1000;
+const DEFAULT_DURATION = 1000
 const TRANSLATE = 'translate'
-
 
 export default function useRenderTransition(
   props: VerticalCarouselProps,
@@ -13,43 +11,52 @@ export default function useRenderTransition(
   numberWidth: ComputedRef<number>,
   numberHeight: ComputedRef<number>,
 ) {
-  // Value determining the axis
+  const isTransitioning = ref(false)
+
+  const directionProps = computed<DirectionProps>(() => {
+    const direction = props.direction as Direction
+    return {
+      isHorizontal: ['left', 'right'].includes(direction),
+      isReverse: ['up', 'left'].includes(direction),
+      flexDirection: {
+        'left': 'row',
+        'right': 'row-reverse',
+        'up': 'column',
+        'down': 'column-reverse'
+      }[direction] as DirectionProps['flexDirection']
+    }
+  })
+
   const axis = computed(() =>
-    ['left', 'right'].includes(props.direction ?? DEFAULT_DIRECTION) ? numberWidth.value : numberHeight.value
+    directionProps.value.isHorizontal ? numberWidth.value : numberHeight.value
   )
 
-  // Value determining the distance
-  const distinct = computed(() =>
-    ['up', 'left'].includes(props.direction ?? DEFAULT_DIRECTION)
-      ? currentIndex.value % renderItems.value.length
-      : renderItems.value.length - (currentIndex.value + (1 % renderItems.value.length))
-  )
+  const distinct = computed(() => {
+    const length = renderItems.value.length
+    const current = currentIndex.value % length
 
-  /**
-   * When the direction is right or up, the distance values are output from the largest to the smallest according to the index.
-   * When the direction is left or right, the distance is calculated based on the width.
-   */
+    return directionProps.value.isReverse
+      ? current
+      : length - (current + (1 % length))
+  })
+
   const slideDistinct = computed(() => {
     return distinct.value * axis.value
   })
 
-  // Axis value based on the direction
-  const directionAxis = computed(() => (['left', 'right'].includes(props.direction ?? DEFAULT_DIRECTION) ? 'X' : 'Y'))
-
-  // Translate value created using the index of the items currently visible on the screen
   const itemsTranslate = computed(() => {
-    return `${TRANSLATE}${directionAxis.value}(-${slideDistinct.value}px)`
+    const axisName = directionProps.value.isHorizontal ? 'X' : 'Y'
+    return `${TRANSLATE}${axisName}(-${slideDistinct.value}px)`
   })
 
-  // default transition value
   const defaultTransition = ref(`transform ${(props.duration ?? DEFAULT_DURATION) / 1000}s ease`)
-
-  // To preserve the original ( defaultTransition ) during initialization.
   const transition = ref(defaultTransition.value)
 
   return {
     itemsTranslate,
     defaultTransition,
     transition,
+    isTransitioning,
+    directionProps,
   }
 }
