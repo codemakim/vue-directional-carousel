@@ -17,9 +17,11 @@ export type DirectionProps = {
   flexDirection: 'row' | 'row-reverse' | 'column' | 'column-reverse'
 }
 
+export type CSSUnit = `${number}${'px' | '%' | 'rem' | 'em' | 'vh' | 'vw'}`
+
 export interface VerticalCarouselProps {
-  width?: string
-  height?: string
+  width?: CSSUnit
+  height?: CSSUnit
   items: VerticalCarouselItem[]
   direction?: Direction
   duration?: number
@@ -40,18 +42,53 @@ export type DotButtonsProps = {
   showDots: boolean
 }
 
-export const validateCarouselProps = (props: VerticalCarouselProps): string | true => {
+export interface ValidationError {
+  prop: string
+  message: string
+}
+
+export const validateCarouselProps = (props: VerticalCarouselProps): ValidationError[] => {
+  const errors: ValidationError[] = []
+
+  // items 검증
   if (!props.items?.length) {
-    return 'At least one item is required'
+    errors.push({
+      prop: 'items',
+      message: 'At least one item is required'
+    })
   }
 
+  // interval 검증
   if (props.interval != null && props.interval < 0) {
-    return 'Interval must be a non-negative number'
+    errors.push({
+      prop: 'interval',
+      message: 'Interval must be a non-negative number'
+    })
   }
 
+  // duration 검증
   if (props.duration != null && props.duration <= 0) {
-    return 'Duration must be greater than 0'
+    errors.push({
+      prop: 'duration',
+      message: 'Duration must be greater than 0'
+    })
   }
 
-  return true
+  // width, height 형식 검증
+  const dimensionRegex = /^(\d+(\.\d+)?)(px|%|rem|em|vh|vw)$/
+  if (props.width && !dimensionRegex.test(props.width)) {
+    errors.push({
+      prop: 'width',
+      message: 'Width must be a valid CSS dimension (e.g., 100%, 200px)'
+    })
+  }
+
+  if (props.height && !dimensionRegex.test(props.height)) {
+    errors.push({
+      prop: 'height',
+      message: 'Height must be a valid CSS dimension (e.g., 300px, 50vh)'
+    })
+  }
+
+  return errors
 }

@@ -81,6 +81,27 @@ export default {
 | showNext             | boolean                             | Optional   | true    | Show next button.                                                                                                                                 |
 | showDots             | boolean                             | Optional   | true    | Show buttons indicating the current image sequence. Click to slide to the corresponding image.                                                    |
 
+## Props Validation Guidelines
+
+For optimal usage, please ensure:
+
+- `items` array contains at least one item
+- `interval` is a non-negative number (0 or greater)
+- `duration` is a positive number (greater than 0)
+- `width` and `height` use valid CSS units (e.g., px, %, rem, em, vh, vw)
+
+Example:
+
+```vue
+<DirectionalCarousel
+  :items="['image1.jpg', 'image2.jpg']"
+  width="100%"
+  height="300px"
+  :interval="2000"
+  :duration="1000"
+/>
+```
+
 ## Events
 
 추후 기능 추가 예정

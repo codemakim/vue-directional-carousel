@@ -29,19 +29,31 @@ const props = withDefaults(defineProps<VerticalCarouselProps>(), {
   pauseAutoplayOnHover: false
 })
 
-// props 변경 감지하여 유효성 검사
+const validateProps = () => {
+  const errors = validateCarouselProps(props)
+  
+  if (errors.length > 0) {
+    errors.forEach(error => {
+      console.error(`DirectionalCarousel: ${error.prop} - ${error.message}`)
+    })
+    
+    if (errors.some(e => e.prop === 'items')) {
+      // items는 필수이므로 심각한 에러로 처리
+      throw new Error('DirectionalCarousel: Invalid props - check console for details')
+    }
+  }
+}
+
+// 초기 검증 및 변경사항 감지
 watch(
   () => ({
     items: props.items,
     interval: props.interval,
-    duration: props.duration
+    duration: props.duration,
+    width: props.width,
+    height: props.height
   }),
-  () => {
-    const validationResult = validateCarouselProps(props)
-    if (validationResult !== true) {
-      console.error(`DirectionalCarousel: ${validationResult}`)
-    }
-  },
+  validateProps,
   { immediate: true }
 )
 
