@@ -175,6 +175,7 @@ defineExpose({
             :key="index"
             :style="itemStyle"
             class="carousel-item"
+            :aria-hidden="currentIndex !== index"
           >
             <slot name="item" v-bind="item" :style="{ width, height }">
               <div class="carousel-image-container" :style="{ width: '100%', height: '100%' }">
@@ -198,7 +199,7 @@ defineExpose({
                 <img
                   v-else
                   :src="item.src"
-                  :alt="`directional-carousel-item-${index}`"
+                  :alt="`Slide image ${index + 1} of ${itemCount}`"
                   :style="{
                     width: '100%',
                     opacity: loadedImages.has(item.src) ? 1 : 0,

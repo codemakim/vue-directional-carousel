@@ -1,5 +1,10 @@
 import { computed, ref, type Ref, type ComputedRef } from 'vue'
-import { type VerticalCarouselProps, type CarouselComputedItemsType, type Direction, DirectionProps } from '@/types/props'
+import {
+  type VerticalCarouselProps,
+  type CarouselComputedItemsType,
+  type Direction,
+  type DirectionProps
+} from '@/types/props'
 
 const DEFAULT_DURATION = 1000
 const TRANSLATE = 'translate'

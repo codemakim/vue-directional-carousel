@@ -16,7 +16,13 @@ const clickNext = () => {
 </script>
 <template>
   <div :style="buttonWrapperStyle">
-    <button class="next-button" :style="buttonStyle" @click="clickNext" @mouseup="onMouseUpButton">
+    <button
+      class="next-button"
+      :style="buttonStyle"
+      @click="clickNext"
+      @mouseup="onMouseUpButton"
+      aria-label="Next slide"
+    >
       <img
         alt="left arrow"
         :src="arrowImage"

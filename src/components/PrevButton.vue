@@ -21,6 +21,7 @@ const clickPrev = () => {
       :style="buttonStyle"
       @click="clickPrev"
       @mousedown="onMouseDownButton"
+      aria-label="Previous slide"
     >
       <img
         alt="left arrow"
