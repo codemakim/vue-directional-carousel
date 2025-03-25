@@ -1,47 +1,82 @@
 // src/tests/DirectionalCarousel.test.ts
-import { flushPromises, mount } from '@vue/test-utils';
-import DirectionalCarousel from '@/components/DirectionalCarousel.vue';
-import { describe, it, expect } from 'vitest';
+import { mount } from '@vue/test-utils';
+import { describe, it, expect, beforeEach } from 'vitest';
+import DirectionalCarousel from '../src/components/DirectionalCarousel.vue';
 
-describe('DirectionalCarousel.vue', () => {
-  it('renders the carousel with default props', () => {
-    const wrapper = mount(DirectionalCarousel, {
+describe('DirectionalCarousel', () => {
+  const mockItems = [
+    { src: 'image1.jpg' },
+    { src: 'image2.jpg' },
+    { src: 'image3.jpg' }
+  ];
+
+  let wrapper: any;
+
+  beforeEach(() => {
+    wrapper = mount(DirectionalCarousel, {
       props: {
-        items: ['image1.jpg', 'image2.jpg', 'image3.jpg'],
-      },
+        items: mockItems,
+        width: '800px',
+        height: '400px',
+        infinite: false
+      }
     });
-
-    // 기본 렌더링 확인
-    expect(wrapper.exists()).toBe(true);
-
-    // 슬라이드 이미지 갯수 확인
-    const slides = wrapper.findAll('.carousel-item');
-    expect(slides.length).toBe(4); // items + 첫 번째 아이템 추가
   });
 
-  it('moves to the next slide when next button is clicked', async () => {
-    const wrapper = mount(DirectionalCarousel, {
-      props: {
-        items: ['image1.jpg', 'image2.jpg', 'image3.jpg'],
-        showNext: true,
-      },
-    });
+  it('renders the carousel with correct number of items', () => {
+    const items = wrapper.findAll('.carousel-item');
+    expect(items).toHaveLength(mockItems.length + 1);
+  });
 
-    const nextButton = wrapper.find('button.next-button');
+  it('shows correct initial slide', () => {
+    const items = wrapper.findAll('.carousel-item');
+    expect(items[0].attributes('aria-hidden')).toBe('false');
+    expect(items[1].attributes('aria-hidden')).toBe('true');
+  });
+
+  it('navigates to next slide when next button is clicked', async () => {
+    const nextButton = wrapper.find('.next-button');
     await nextButton.trigger('click');
-    expect(wrapper.vm.currentIndex).toBe(1); // 첫번째 슬라이드에서 두번째로 이동
+
+    const items = wrapper.findAll('.carousel-item');
+    expect(items[0].attributes('aria-hidden')).toBe('true');
+    expect(items[1].attributes('aria-hidden')).toBe('false');
   });
 
-  it('moves to the previous slide when prev button is clicked', async () => {
-    const wrapper = mount(DirectionalCarousel, {
-      props: {
-        items: ['image1.jpg', 'image2.jpg', 'image3.jpg'],
-        showPrev: true,
-      },
-    });
+  it('navigates to previous slide when prev button is clicked', async () => {
+    const nextButton = wrapper.find('.next-button');
+    await nextButton.trigger('click');
 
-    const prevButton = wrapper.find('button.prev-button');
+    const prevButton = wrapper.find('.prev-button');
     await prevButton.trigger('click');
-    expect(wrapper.vm.currentIndex).toBe(wrapper.vm.items.length); // 첫 슬라이드에서 마지막 슬라이드로 이동
+
+    const items = wrapper.findAll('.carousel-item');
+    expect(items[0].attributes('aria-hidden')).toBe('false');
+    expect(items[1].attributes('aria-hidden')).toBe('true');
+  });
+
+  it('handles dot navigation correctly', async () => {
+    const buttons = wrapper.findAll('button[aria-label^="Go to slide"]');
+    await buttons[1].trigger('click');
+
+    const items = wrapper.findAll('.carousel-item');
+    expect(items[1].attributes('aria-hidden')).toBe('false');
+    expect(items[0].attributes('aria-hidden')).toBe('true');
+  });
+
+  it('handles image error state', async () => {
+    const firstImage = wrapper.find('.carousel-image-container img');
+    await firstImage.trigger('error');
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.find('.carousel-image-error').exists()).toBe(true);
+  });
+
+  it('applies width and height from props', () => {
+    const carousel = wrapper.find('div');
+    const style = carousel.attributes('style');
+
+    expect(style).toContain('width: 800px');
+    expect(style).toContain('height: 400px');
   });
 });

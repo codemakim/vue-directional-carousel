@@ -122,6 +122,16 @@ const {
   preloadImage
 } = useImageLoading(currentIndex, computedItems)
 
+const handleImageLoad = (src: string) => {
+  loadingStates.value.set(src, false)
+  loadedImages.value.add(src)
+}
+
+const handleImageError = (src: string) => {
+  loadingStates.value.set(src, false)
+  errorStates.value.set(src, true)
+}
+
 defineExpose({
   currentIndex,
 })
@@ -205,7 +215,8 @@ defineExpose({
                     opacity: loadedImages.has(item.src) ? 1 : 0,
                     transition: 'opacity 0.2s'
                   }"
-                  @load="loadedImages.add(item.src)"
+                  @load="handleImageLoad(item.src)"
+                  @error="handleImageError(item.src)"
                 />
               </div>
             </slot>
