@@ -17,6 +17,7 @@ const clickNext = () => {
 <template>
   <div :style="buttonWrapperStyle">
     <button
+      type="button"
       class="next-button"
       :style="buttonStyle"
       @click="clickNext"

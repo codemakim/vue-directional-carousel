@@ -53,7 +53,8 @@ const dotStyles = computed(() =>
         padding: '0px 4px 0px 4px'
       }"
     >
-      <button 
+      <button
+        type="button"
         :style="dotStyles[seq - 1]"
         @click="clickDot(seq)"
         :aria-label="`Go to slide ${seq}`"

@@ -17,6 +17,7 @@ const clickPrev = () => {
 <template>
   <div :style="buttonWrapperStyle">
     <button
+      type="button"
       class="prev-button"
       :style="buttonStyle"
       @click="clickPrev"
