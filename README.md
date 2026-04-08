@@ -80,6 +80,7 @@ export default {
 | showPrev             | boolean                             | Optional   | true    | Show previous button.                                                                                                                             |
 | showNext             | boolean                             | Optional   | true    | Show next button.                                                                                                                                 |
 | showDots             | boolean                             | Optional   | true    | Show buttons indicating the current image sequence. Click to slide to the corresponding image.                                                    |
+| currentIndex         | number                              | Optional   | 0       | Current visible slide index (0-based). Supports `v-model:currentIndex` for two-way binding so the carousel can be controlled from outside.        |
 
 ## Props Validation Guidelines
 
@@ -104,7 +105,56 @@ Example:
 
 ## Events
 
-추후 기능 추가 예정
+| event                  | payload  | description                                                                                                                                  |
+| ---------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `update:currentIndex`  | `number` | Fired whenever the visible slide changes (next/prev/dot click, autoplay, or programmatic update). Payload is the normalized index `0..items.length - 1`. Pairs with `v-model:currentIndex`. |
+
+## Controlling the carousel from outside
+
+You can drive the carousel from your own UI (e.g. a tab list above the slides) by binding `v-model:currentIndex`. The carousel exposes a normalized index, so the value is always within `[0, items.length - 1]` regardless of the internal infinite-loop transition.
+
+```vue
+<script setup>
+import { ref } from 'vue'
+import DirectionalCarousel from 'vue-directional-carousel'
+
+const pages = [
+  { title: 'Summary', src: '/reports/summary.png' },
+  { title: 'Revenue', src: '/reports/revenue.png' },
+  { title: 'Costs',   src: '/reports/costs.png' },
+  { title: 'Outlook', src: '/reports/outlook.png' }
+]
+
+const currentPage = ref(0)
+</script>
+
+<template>
+  <nav class="page-tabs">
+    <button
+      v-for="(page, i) in pages"
+      :key="i"
+      type="button"
+      :class="{ active: currentPage === i }"
+      @click="currentPage = i"
+    >
+      {{ page.title }}
+    </button>
+  </nav>
+
+  <DirectionalCarousel
+    v-model:currentIndex="currentPage"
+    :items="pages"
+    width="800px"
+    height="500px"
+  />
+</template>
+```
+
+Notes:
+
+- If the parent does not bind `v-model:currentIndex`, the carousel manages its own state — existing usage keeps working with no changes.
+- Setting an out-of-range or non-integer value is ignored and a warning is logged. The carousel stays on its current slide.
+- While a transition is in flight, programmatic index changes are ignored to prevent jumpy state. The next change after the transition completes is honored.
 
 ## Slots
 

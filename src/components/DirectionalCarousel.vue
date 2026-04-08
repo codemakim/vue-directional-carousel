@@ -71,8 +71,14 @@ const itemCount = computed(() => props.items.length)
 // image list for rendering
 const renderItems = computed(() => [...computedItems.value, computedItems.value[0]])
 
-// current visible item index.
-const currentIndex = ref(0)
+// External, normalized index in [0, itemCount-1].
+// Acts as v-model:currentIndex when parent binds it; otherwise behaves as internal state.
+const currentIndex = defineModel<number>('currentIndex', { default: 0 })
+
+// Internal "displayed" index in [0, itemCount]. The extra position (itemCount) is the
+// cloned first slide used for the infinite-loop transition. The composables operate on
+// this ref so existing animation logic stays unchanged.
+const displayedIndex = ref(currentIndex.value)
 
 // Width value for calculating the movement distance
 const numberWidth = computed(() => carouselContainer.value?.offsetWidth ?? 0)
@@ -87,7 +93,7 @@ const {
   transition,
   isTransitioning,
   directionProps
-} = useRenderTransition(props, renderItems, currentIndex, numberWidth, numberHeight)
+} = useRenderTransition(props, renderItems, displayedIndex, numberWidth, numberHeight)
 
 const {
   clickNext,
@@ -96,14 +102,44 @@ const {
   pauseSlide,
   resumeSlide,
 } = useCarouselEvent(
-  props, 
-  computedItems, 
-  renderItems, 
-  currentIndex, 
-  defaultTransition, 
+  props,
+  computedItems,
+  renderItems,
+  displayedIndex,
+  defaultTransition,
   transition,
   isTransitioning
 )
+
+// Internal -> External: keep the model in sync with the displayed index, normalized.
+watch(displayedIndex, (val) => {
+  if (itemCount.value === 0) return
+  const normalized = val % itemCount.value
+  if (currentIndex.value !== normalized) {
+    currentIndex.value = normalized
+  }
+})
+
+// External -> Internal: when the parent sets v-model:currentIndex, move the carousel.
+// Validates the input and respects the in-flight transition guard.
+watch(currentIndex, (val) => {
+  if (
+    typeof val !== 'number' ||
+    !Number.isInteger(val) ||
+    val < 0 ||
+    val >= itemCount.value
+  ) {
+    console.warn(
+      `DirectionalCarousel: invalid currentIndex "${val}". Must be an integer in [0, ${itemCount.value - 1}].`
+    )
+    const normalized = displayedIndex.value % itemCount.value
+    if (currentIndex.value !== normalized) currentIndex.value = normalized
+    return
+  }
+  if (isTransitioning.value) return
+  if ((displayedIndex.value % itemCount.value) === val) return
+  displayedIndex.value = val
+})
 
 // 아이템 엘리먼트의 스타일
 const itemStyle: ComputedRef<CSSProperties> = computed(() => ({
@@ -185,7 +221,7 @@ defineExpose({
             :key="index"
             :style="itemStyle"
             class="carousel-item"
-            :aria-hidden="currentIndex !== index"
+            :aria-hidden="displayedIndex !== index"
           >
             <slot name="item" v-bind="item" :style="{ width, height }">
               <div class="carousel-image-container" :style="{ width: '100%', height: '100%' }">

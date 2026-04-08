@@ -1,6 +1,7 @@
 // src/tests/DirectionalCarousel.test.ts
 import { mount } from '@vue/test-utils';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { nextTick } from 'vue';
 import DirectionalCarousel from '../src/components/DirectionalCarousel.vue';
 
 describe('DirectionalCarousel', () => {
@@ -78,5 +79,99 @@ describe('DirectionalCarousel', () => {
 
     expect(style).toContain('width: 800px');
     expect(style).toContain('height: 400px');
+  });
+
+  describe('v-model:currentIndex', () => {
+    it('respects initial currentIndex prop', () => {
+      const w = mount(DirectionalCarousel, {
+        props: { items: mockItems, currentIndex: 2 }
+      });
+      const items = w.findAll('.carousel-item');
+      expect(items[2].attributes('aria-hidden')).toBe('false');
+      expect(items[0].attributes('aria-hidden')).toBe('true');
+    });
+
+    it('moves the slide when parent updates currentIndex', async () => {
+      const w = mount(DirectionalCarousel, {
+        props: { items: mockItems, currentIndex: 0 }
+      });
+      await w.setProps({ currentIndex: 2 });
+      const items = w.findAll('.carousel-item');
+      expect(items[2].attributes('aria-hidden')).toBe('false');
+    });
+
+    it('emits update:currentIndex when next button is clicked', async () => {
+      const w = mount(DirectionalCarousel, { props: { items: mockItems } });
+      await w.find('.next-button').trigger('click');
+      const events = w.emitted('update:currentIndex');
+      expect(events).toBeTruthy();
+      expect(events![events!.length - 1]).toEqual([1]);
+    });
+
+    it('emits update:currentIndex when prev button is clicked', async () => {
+      const w = mount(DirectionalCarousel, {
+        props: { items: mockItems, currentIndex: 1 }
+      });
+      await nextTick();
+      await w.find('.prev-button').trigger('click');
+      const events = w.emitted('update:currentIndex');
+      expect(events).toBeTruthy();
+      expect(events![events!.length - 1]).toEqual([0]);
+    });
+
+    it('emits update:currentIndex when a dot button is clicked', async () => {
+      const w = mount(DirectionalCarousel, { props: { items: mockItems } });
+      const dots = w.findAll('button[aria-label^="Go to slide"]');
+      await dots[2].trigger('click');
+      const events = w.emitted('update:currentIndex');
+      expect(events).toBeTruthy();
+      expect(events![events!.length - 1]).toEqual([2]);
+    });
+
+    it('exposes a normalized index (always within [0, itemCount-1])', async () => {
+      const w = mount(DirectionalCarousel, { props: { items: mockItems } });
+      // Click next on the last slide to trigger wrap-around.
+      await w.setProps({ currentIndex: 2 });
+      await w.find('.next-button').trigger('click');
+      const events = w.emitted('update:currentIndex')!;
+      // Every emitted value must be within range.
+      for (const ev of events) {
+        const v = ev[0] as number;
+        expect(v).toBeGreaterThanOrEqual(0);
+        expect(v).toBeLessThan(mockItems.length);
+      }
+    });
+
+    it('warns and ignores out-of-range currentIndex', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const w = mount(DirectionalCarousel, {
+        props: { items: mockItems, currentIndex: 0 }
+      });
+      await w.setProps({ currentIndex: 99 });
+      expect(warn).toHaveBeenCalled();
+      // Should not have moved past the valid range.
+      const items = w.findAll('.carousel-item');
+      expect(items[0].attributes('aria-hidden')).toBe('false');
+      warn.mockRestore();
+    });
+
+    it('warns and ignores negative currentIndex', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const w = mount(DirectionalCarousel, {
+        props: { items: mockItems, currentIndex: 1 }
+      });
+      await w.setProps({ currentIndex: -1 });
+      expect(warn).toHaveBeenCalled();
+      const items = w.findAll('.carousel-item');
+      expect(items[1].attributes('aria-hidden')).toBe('false');
+      warn.mockRestore();
+    });
+
+    it('keeps working without v-model binding (uncontrolled fallback)', async () => {
+      const w = mount(DirectionalCarousel, { props: { items: mockItems } });
+      await w.find('.next-button').trigger('click');
+      const items = w.findAll('.carousel-item');
+      expect(items[1].attributes('aria-hidden')).toBe('false');
+    });
   });
 });
