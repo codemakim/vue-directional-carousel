@@ -162,7 +162,21 @@ export default function useCarouselEvent(
 
   // Component lifecycle hooks
   onMounted(() => {
+    // Disable transition for the very first paint so the initial translate value
+    // (which snaps from 0 to the real dimension once the container is measured)
+    // does not produce a visible flash animation.
     transition.value = ''
+    // Re-enable transition after the initial layout has been committed. Two nested
+    // rAFs guarantee we wait until after the first paint — the same pattern used
+    // by the wrap-around logic in `next()`. Without this, the first interaction
+    // that touches currentIndex without going through `setTransition()` (external
+    // v-model update, dot click, prev click in the non-wrap branch) would move
+    // instantly with no animation.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        transition.value = defaultTransition.value
+      })
+    })
     if (props.interval && props.items.length > 1) {
       initInterval()
     }

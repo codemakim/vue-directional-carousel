@@ -173,5 +173,23 @@ describe('DirectionalCarousel', () => {
       const items = w.findAll('.carousel-item');
       expect(items[1].attributes('aria-hidden')).toBe('false');
     });
+
+    // Regression: before the fix, transition was disabled on mount and only restored
+    // inside setTransition()/next(). Programmatic index changes (v-model), dot clicks,
+    // and the non-wrap prev click would move instantly without animation until the
+    // user happened to click the next arrow once. The fix re-enables transition
+    // after two requestAnimationFrame ticks in onMounted.
+    it('has transition enabled after initial layout so programmatic changes animate', async () => {
+      const w = mount(DirectionalCarousel, { props: { items: mockItems } });
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => resolve());
+        });
+      });
+      await nextTick();
+      const slider = w.find('.wrapper-carousel-items');
+      const style = slider.attributes('style') || '';
+      expect(style).toMatch(/transition:\s*transform/);
+    });
   });
 });
